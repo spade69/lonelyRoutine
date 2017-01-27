@@ -1,28 +1,7 @@
-<<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>React game</title>
-    <script src="https://unpkg.com/react@15.3.2/dist/react.js"></script>
-    <script src="https://unpkg.com/react-dom@15.3.2/dist/react-dom.js"></script>
-    <script src="https://unpkg.com/babel-core@5.8.38/browser.min.js"></script>
-    <style>
-      body{background:#eeeeee;}
-      #canvas{
-        cursor:pointer;
-        margin-left:10px;
-        margin-top:10px;
-
-      }
-    </style>
-</head>
-<body>
-    <div id="container">
-        <div id="root"></div>
-        <canvas id="canvas" width=800 height=600>Canvas not supported</canvas>
-    </div>
-    <script type="text/babel">
-
+/*
+ *option compoent
+  select compoent
+* */
 function OptionItem(props){
   return <option>{props.value}</option>;
 }
@@ -65,6 +44,9 @@ class FlavorForm extends React.Component{
           Pick your favorite
           <Select items={items} />
         </label>
+        {props.Guide}
+        <input type='checkbox'checked />
+        <input type='button' value='Erase all' />
         <input type="submit" value="Submit"/>
       </form>
     );
@@ -77,7 +59,3 @@ document.getElementById('root')
 );
 
 
-    </script>
-    <script src="arc.js"></script> 
-</body>
-</html>
