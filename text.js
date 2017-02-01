@@ -5,7 +5,22 @@ var canvas=document.getElementById('canvas'),
     alignValues=['start','center','end'],
     baselineValues=['top','middle','bottom','alphabetic','ideographic','hanging'],
     x,y,
-    text='HTML5';
+    text='HTML5',
+    VERTICAL_TICK_SPACING=10,
+    HORIZONTAL_TICK_SPACING=10,
+    AXIS_WIDTH=300,
+    AXIS_HEIGHT=400,
+    NUM_VERTICAL_TICKS=AXIS_HEIGHT/VERTICAL_TICK_SPACING,
+    NUM_HORIZONTAL_TICKS=AXIS_WIDTH/HORIZONTAL_TICK_SPACING,
+    SPACE_BETWEEN_LABELS_AND_AXIS=2,
+    AXIS_ORIGIN={x:50,y:50},
+    DEGREE_ANNOTATIONS_FILL_STYLE='rgba(0,0,230,0.9)',
+    DEGREE_ANNOTATIONS_TEXT_SIZE=12,
+    TEXT_FILL_STYLE='rgba(100,130,240,0.5)',
+    TEXT_STROKE_STYLE='rgba(200,0,0,0.7)',
+    TEXT_SIZE=64,
+    circle={x:canvas.width/2,y:canvas.height/2,radius:200}
+    ;
 
 //Function
 function draw(){
@@ -93,6 +108,70 @@ function drawMiddleText(){
   context.textBaseline='middle';
 }
 
+//draw Axis label/text
+function drawHorizontalAxisLabels(){
+  context.textAlign='center';
+  context.textBaseline='top';
+  for(var i=0;i<=NUM_HORIZONTAL_TICKS;++i){
+    if(i%5===0){
+      context.fillText(i,AXIS_ORIGIN.x+i*HORIZONTAL_TICK_SPACING,
+                      AXIS_ORIGIN.y+SPACE_BETWEEN_LABELS_AND_AXIS)
+    }
+  }
+}
+
+function drawVerticalAxisLabels(){
+  context.textAlign='right';
+  context.textBaseline='middle';
+  for(var i=0;i<=NUM_VERTICAL_TICKS;++i){
+    if(i%5===0){
+      context.fillText(i,AXIS_ORIGIN.x-SPACE_BETWEEN_LABELS_AND_AXIS,
+                      AXIS_ORIGIN.y-i*VERTICAL_TICK_SPACING);
+    }
+  }
+}
+
+function drawDegreeAnnotatioons(){
+  var radius=circle.radius+DEGREE_DIAL_MARGIN;
+  context.save();
+  context.fillStyle=DEGREE_ANNOTATIONS_FILL_STYLE;
+  context.font=DEGREE_ANNOTATIONS_TEXT_SIZE+'px Helvetica';
+
+  for(var angle=0;angle<2*Math.PI;angle+=Math.PI/8){
+    context.beginPath();
+    context.fillText((angle*180/Math.PI).toFixed(0),
+                    circle.x+Math.cos(angle)*(radius-TICK_WIDTH*2),
+                    circle.y-Math.sin(angle)*(radius-TICK_WIDTH*2));
+  }
+  context.restore();
+}
+
+function drawCircularText(string,startAngle,endAngle){
+  var radius=circle.radius,
+      angleDecrement=(startAngle-endAngle)/(string.length-1),
+      angle=parseFloat(startAngle),
+      index=0,
+      character;
+  context.save();
+  context.fillStyle=TEXT_FILL_STYLE;
+  context.strokeStyle=TEXT_STROKE_STYLE;
+  context.font=TEXT_SIZE+'px Lucida Sans';
+  while(index<string.length){
+    character=string.charAt(index);
+    context.save();
+    context.beginPath();
+    context.translate(circle.x+Math.cos(angle)*radius,
+                      circle.y-Math.sin(angle)*radius);
+    context.rotate(Math.PI/2-angle);
+    context.fillText(character,0,0);
+    context.strokeText(character,0,0);
+    angle-=angleDecrement;
+    index++;
+
+    context.restore();
+  }
+}
+
 //context.font='128px Palatino';
 context.font='oblique normal bold 24px palatino';
 /*
@@ -112,5 +191,5 @@ for(var align=0;align<alignValues.length;++align){
   }
 }
 
-
+drawCircularText("clockwise around the circle",Math.PI*2,Math.PI/8);
 

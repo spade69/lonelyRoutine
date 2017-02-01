@@ -27,6 +27,10 @@
       <input type="checkbox" id="shadowCheckbox" />
       <input type="radio" id="drawRadio" checked/>
       <input type="radio" id="eraserRadio" checked/>
+      <input id="scaleSlider" type="range" step='0.01' value='1.0' 
+      min="1" max='3.0'/>
+      <button id='eraseAllButton'></button>
+      <output id="scaleOutput">1.0</output>
     </div>
     <script type="text/babel">
 
@@ -85,6 +89,6 @@ document.getElementById('root')
 
 
     </script>
-    <script src="text.js"></script> 
+    <script src="eraserOff.js"></script> 
 </body>
 </html>
