@@ -46,7 +46,7 @@ function restoreRubberbandPixels(){
                       rubberbandRectangle.left+context.lineWidth,
                       rubberbandRectangle.top+context.lineWidth,
                       (rubberbandRectangle.width-2*context.lineWidth)*deviceWidthOverCSSPixels,
-                      (rubberbandRectangle.height-2*context.lineWidth)*deviceHeightOverCSSPixels;
+                      (rubberbandRectangle.height-2*context.lineWidth)*deviceHeightOverCSSPixels);
 }
 
 
