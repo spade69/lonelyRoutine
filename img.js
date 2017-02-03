@@ -77,7 +77,6 @@ function drawWatermark(){
   context.font=FONT_HEIGHT+'px Arial';
   textMetrics=context.measureText(lineOne);//measure the text width
   context.globalAlpha=0.6;
-    context.putImageData(event.data,0,0);
   context.translate(canvas.width/2,canvas.height/2-FONT_HEIGHT/2);
   context.fillText(lineOne,-textMetrics.width/2,0);
   context.strokeText(lineOne,-textMetrics.width/2,0);
@@ -259,7 +258,7 @@ function drawMagnifyingGlass(mouse){
   manifyingGlassX=mouse.x;
   manifyingGlassY=mouse.y;
   calculateMagnifyRectangle(mouse);
-  imageData=context.getImageData(magnifyRectangle.x,magnifyRectangle.y
+  imageData=context.getImageData(magnifyRectangle.x,magnifyRectangle.y,
                                 magnifyRectangle.width,magnifyRectangle.height);
   context.save();
   scaledMagnifyRectangle=={

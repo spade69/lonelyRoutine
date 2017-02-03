@@ -7,12 +7,12 @@
     <script src="https://unpkg.com/react-dom@15.3.2/dist/react-dom.js"></script>
     <script src="https://unpkg.com/babel-core@5.8.38/browser.min.js"></script>
     <style>
-      body{background:#eeeeee;}
+      body{background:#dddddd;}
       #canvas{
         cursor:pointer;
         margin-left:10px;
         margin-top:10px;
-
+        background:#ffffff;
       }
     </style>
 </head>
@@ -31,6 +31,8 @@
       min="1" max='3.0'/>
       <button id='eraseAllButton'>erase</button>
       <button id="sunglassButton">sunglass</button>
+      <button id="animateButton">startAnimation</button>
+      <button id="startStopButton">startButton</button>
       <output id="scaleOutput">1.0</output>
     </div>
     <script type="text/babel">
@@ -90,6 +92,7 @@ document.getElementById('root')
 
 
     </script>
-    <script src="img.js"></script> 
+    <script src="requestNextAnimationFrame.js"></script> 
+    <script src="animate.js"></script>
 </body>
 </html>
