@@ -1,0 +1,31 @@
+{
+  "name": "lonely_routine",
+  "version": "1.0.0",
+  "description": "A game and animation framework",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/spade69/lonelyRoutine.git"
+  },
+  "author": "Jason",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/spade69/lonelyRoutine/issues"
+  },
+  "homepage": "https://github.com/spade69/lonelyRoutine#readme",
+  "devDependencies": {
+       "css-loader": "^0.26.1",
+      "gulp": "^3.9.1",
+      "gulp-autoprefixer": "^3.1.1",
+      "gulp-concat": "^2.6.1",
+      "gulp-cssnano": "^2.1.2",
+      "gulp-livereload": "^3.8.1",
+      "gulp-rename": "^1.2.2",
+      "gulp-ruby-sass": "^2.1.1",
+      "style-loader": "^0.13.1",
+      "webpack": "^1.14.0"
+  }
+}

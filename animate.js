@@ -57,7 +57,7 @@ var canvas=document.getElementById('canvas'),
     grass=new Image(),
     grass2=new Image(),
     sky=new Image(),
-    fps=60,
+    fps=120,
     skyOffset=0,
     grassOffset=0,
     treeOffset=0,
@@ -181,16 +181,16 @@ function eraseBackground(){
   context.clearRect(0,0,canvas.width,canvas.height);
 }
 
-//Animation
-function animate(time){
+//Animation 
+function animateDFps(now){//different fps
   var fps=0;
-  if(time==undefined){
-    time=+new Date();
+  if(now==undefined){
+    now=+new Date();
   }
   if(!paused){
-    context.clearRect(0,0,canvas.width,canvas.height);
+    eraseBackground();
     drawBackground();
-    update(time);
+    update();
     draw();
     fps=calculateFps();
     //once per second update the frame rate
@@ -198,7 +198,7 @@ function animate(time){
       lastFpsUpdateTime=now;
       lastFpsUpdate=fps;
     }
-//    window.requestNextAnimationFrame(animate);
+    window.requestNextAnimationFrame(animateDFps);
     context.fillStyle='cornflowerblue';
     context.fillText=(lastFpsUpdate.toFixed()+'fps',50,58);
   }
@@ -213,6 +213,19 @@ function animateFps(time){
   context.fillStyle='cornflowerblue';
   context.fillText(calculateFps().toFixed()+'fps',20,60);
   window.requestNextAnimationFrame(animateFps);
+}
+
+//generally animate 
+function animate(now){
+  if(now===undefined){
+    now=+new Date;
+  }
+    fps=calculateFps(now);
+    if(!paused){
+        eraseBackground();
+        draw();
+    }
+    requestNextAnimationFrame(animate);
 }
 
 //window.requestNextAnimationFrame(animateFps);
@@ -318,7 +331,8 @@ animateButton.onclick=function(e){
   if(paused){
     animateButton.value='Animate';
   }else{
-    window.requestNextAnimationFrame(animate);
+    //window.requestNextAnimationFrame(animateDFps);
+    window.requestNextAnimationFrame(animateLayer);
     animateButton.value='Pause';
   }
 };
@@ -349,16 +363,16 @@ canvas.onmouseup=function(e){
 }
 
 context.font='48px Helvetica';
-/*
-tree.src='smalltree.png';
-nearTree.src='tree.png';
-grass.src='grass.png';
-grass2.src='grass2.png';
-sky.src='sky.png';
+
+tree.src='img/smalltree.png';
+nearTree.src='img/tree-twotrunks.png';
+grass.src='img/grass.png';
+grass2.src='img/grass2.png';
+sky.src='img/sky.png';
 sky.onload=function(e){
   drawMultipleLayer();
 };
 
 requestNextAnimationFrame(animateLayer);
-*/
+
 
