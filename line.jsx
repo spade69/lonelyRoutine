@@ -1,5 +1,7 @@
 
 //
+import React from 'react';
+
 
 function ListItem(props){
   return <li>{props.value}</li>;
@@ -32,6 +34,13 @@ function Select(props){
   );
 }
 
+export  {
+  ListItem,
+  NumberList,
+  OptionItem,
+  Select
+};
+
 const items=['red','green','blue','orange','cornflowerblue'];
 const numbers=[1,2,3,4,5];
 ReactDOM.render(
@@ -42,3 +51,4 @@ ReactDOM.render(
   <NumberList numbers={numbers} />,
   document.getElementById('root')
 );
+

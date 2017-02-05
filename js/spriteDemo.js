@@ -23,7 +23,7 @@ var canvas=document.getElementById('canvas'),
     HOUR_HAND_TRUNCATION=35,
     RADIUS=75,
     //Bomb imagePainter
-    bomb=new Sprite('bomb',new ImagePainter('img/bomb.png')),
+    bomb=new Sprite('bomb',bombPainter),
     BOMB_LEFT=200,
     BOMB_TOP=80,
     BOMB_WIDTH=180,
@@ -32,7 +32,19 @@ var canvas=document.getElementById('canvas'),
     NUM_EXPLOSION_PAINTERS=9,
     NUM_FUSE_PAINTERS=9,
     bombPainter=new ImagePainter('img/bomb.png'),
-    
+    bombNoFusePainter=new ImagePainter('imgsX/bomb-no-fuse.png'),
+    fuseBurningPainters=[],
+    explosionPainters=[],
+
+    //Animator
+    fuseBurningAnimator=new SpriteAnimator(fuseBurningPainters,
+        function(){
+            bomb.painter=bombNoFusePainter;
+        }),
+    explosionAnimator=new SpriteAnimator(explosionPainters,
+        function(){
+            bomb.painter=bombNoFusePainter;
+        });
 
 /*    ball=new Sprite('ball',{paint:function(sprite,context){
         context.beginPath();
@@ -184,18 +196,8 @@ function drawClock(){
     drawHands();
 }
 
-function animate(){
-    context.clearRect(0,0,canvas.width,canvas.height);
-    drawGrid('lightgray',10,10);
-    drawClock();
-    window.requestNextAnimationFrame(animate);
-}
 
-function animateBomb(){
-    context.clearRect(0,0,canvas.width,canvas.height);
-    bomb.paint(context);
-    window.requestNextAnimationFrame(animateBomb);
-}
+
 
 //SpriteSheet
 function drawBackground(){
@@ -219,6 +221,14 @@ function startAnimation(){
     paused=false;
     lastAdvance= +new Date();
     window.requestNextAnimationFrame(animateSheet)
+}
+
+//Normall animate
+function animate(){
+    context.clearRect(0,0,canvas.width,canvas.height);
+    drawGrid('lightgray',10,10);
+    drawClock();
+    window.requestNextAnimationFrame(animate);
 }
 
 //绘制背景以及页面上面的精灵表，再绘制精灵
@@ -249,6 +259,19 @@ function animateX(time){
     window.requestNextAnimationFrame(animateX);
 }
 
+//Bomb animate
+function animateBomb(now){
+    context.clearRect(0,0,canvas.width,canvas.height);
+    bomb.paint(context);
+    window.requestNextAnimationFrame(animateBomb);
+}
+
+//Bomb function
+function resetBombNoFuse(){
+    bomb.painter=bombNoFusePainter;
+}
+
+
 //Event handler
 animateButton.onclick=function(e){
     if(animateButton.value==='Animate') 
@@ -256,6 +279,21 @@ animateButton.onclick=function(e){
     else
         pauseAnimation();
 }
+
+animateButton.onclick=function(e){
+    if(bomb.animating) //not now..
+        return;
+    //Burn fuse for 2seconds
+    fuseBurningAnimator.start(bomb,2000);
+    //Wait for 3 s ,then explode for 1 second
+    setTimeout(function(){
+        explosionAnimator.start(bomb,1000);
+        //wait for 2s then reset to the original bomb image
+        setTimeout(function(){
+            bomb.painter=bombPainter;
+        },2000);
+    },3000);
+};
 
 //intialization
 context.lineWidth=0.5;
@@ -271,9 +309,18 @@ bomb.left=BOMB_LEFT;
 bomb.top= BOMB_TOP;
 bomb.width=BOMB_WIDTH;
 bomb.height=BOMB_HEIGHT;
+
+for(var i=0;i<NUM_FUSE_PAINTERS;++i){
+    fuseBurningPainters.push(new ImagePainter('imgsX/fuse-0'+i+'.png'));
+}
+
+for(var i=0;i<NUM_EXPLOSION_PAINTERS;++i){
+    explosionPainters.push(new ImagePainter('imgsX/explosion-0'+i+'.png'));
+}
+
 //window.requestNextAnimationFrame(animate);
 //
-//window.requestNextAnimationFrame(animateBomb);
+window.requestNextAnimationFrame(animateBomb);
 //drawGrid('lightgray',10,10);
 
 //spritesheet initialization

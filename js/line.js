@@ -120,20 +120,29 @@ function drawDashedLine(context,x1,y1,x2,y2,dashLength){
   context.stroke();
 };
 
-context.lineWidth=3;
-context.strokeStyle='blue';
-drawDashedLine(context,20,20,context.canvas.width-20,20);
-drawDashedLine(context,context.canvas.width-20,20,
+function main(context){
+  context.lineWidth=3;
+  context.strokeStyle='blue';
+  drawDashedLine(context,20,20,context.canvas.width-20,20);
+  drawDashedLine(context,context.canvas.width-20,20,
   context.canvas.width-20,context.canvas.height-20,10);
-
-drawDashedLine(context,context.canvas.width-20,
+  drawDashedLine(context,context.canvas.width-20,
   context.canvas.height-20,20,context.canvas.height-20,15);
 
-//Initialization...
-drawGrid('lightgray',10,10);
-drawAxes();
+  //Initialization...
+  drawGrid('lightgray',10,10);
+  drawAxes();
+}
 
-
+module.exports={
+  drawGrid:drawGrid,
+  drawAxes:drawAxes,
+  drawHorizontalAxis:drawHorizontalAxis,
+  drawVerticalAxis:drawVerticalAxis,
+  drawVerticalAXisTicks:drawVerticalAXisTicks,
+  drawHorizontalAxisTicks:drawHorizontalAxisTicks,
+  drawDashedLine:drawDashedLine
+}
 
 
 

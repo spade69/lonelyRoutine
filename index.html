@@ -3,9 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>React game</title>
-    <script src="https://unpkg.com/react@15.3.2/dist/react.js"></script>
-    <script src="https://unpkg.com/react-dom@15.3.2/dist/react-dom.js"></script>
-    <script src="https://unpkg.com/babel-core@5.8.38/browser.min.js"></script>
     <style>
       body{background:#dddddd;}
       #canvas{
@@ -35,65 +32,7 @@
       <button id="startStopButton">startButton</button>
       <output id="scaleOutput">1.0</output>
     </div>
-    <script type="text/babel">
-
-function OptionItem(props){
-  return <option>{props.value}</option>;
-}
-
-function Select(props){
-  const items=props.items;
-  const optionItems=items.map((item)=>
-    <OptionItem key={item.toString()} value={item} />
-  );
-
-  return (
-    <select>{optionItems}</select>
-  );
-}
-
-const items=['red','green','blue','orange','cornflowerblue'];
-
-class FlavorForm extends React.Component{
-  constructor(props){
-    super(props);
-    this.state={value:'coconut'};
-
-    this.handleChange=this.handleChange.bind(this);
-    this.handleSubmit=this.handleSubmit.bind(this);
-  }
-
-  handleChange(event){
-    this.setState({value:event.target.value});
-  }
-
-  handleSubmit(event){
-    alert('Your favorite flavor is : '+this.state.value);
-    event.preventDefault();
-  }
-
-  render(){
-    return(
-      <form onSubmit={this.handleSubmit}>
-        <label>
-          Pick your favorite
-          <Select items={items} />
-        </label>
-        <input type="submit" value="Submit"/>
-      </form>
-    );
-  }
-}
-
-ReactDOM.render(
-<FlavorForm /> ,
-document.getElementById('root')
-);
-
-
-    </script>
-    <script type="text/javascript" src="requestNextAnimationFrame.js"></script>
-    <script src="sprites.js"></script> 
-    <script src="spriteDemo.js"></script>
+    <script src="dist/common.js"></script>
+    <script src="dist/index.bundle.js"></script> 
 </body>
 </html>

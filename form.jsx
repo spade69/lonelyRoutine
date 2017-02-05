@@ -2,6 +2,8 @@
  *option compoent
   select compoent
 * */
+import React from 'react';
+
 function OptionItem(props){
   return <option>{props.value}</option>;
 }
