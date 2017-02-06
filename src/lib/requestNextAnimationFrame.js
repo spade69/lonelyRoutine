@@ -60,3 +60,5 @@ window.requestNextAnimationFrame=
     };
   })
 ();
+
+export default window.requestNextAnimationFrame;

@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack",
-    "dev": "webpack-dev-server --devtool eval --progress --hot --content-base build"
+    "build": "webpack --watch",
+    "dev": "webpack-dev-server --watch --color --progress"
   },
   "repository": {
     "type": "git",
@@ -21,6 +21,8 @@
   "devDependencies": {
     "babel-core": "^6.22.1",
     "babel-loader": "^6.2.10",
+    "babel-preset-env": "^1.1.8",
+    "babel-preset-react": "^6.22.0",
     "css-loader": "^0.26.1",
     "gulp": "^3.9.1",
     "gulp-autoprefixer": "^3.1.1",
@@ -30,10 +32,13 @@
     "gulp-rename": "^1.2.2",
     "gulp-ruby-sass": "^2.1.1",
     "gulp-webpack": "^1.5.0",
+    "postcss-loader": "^1.2.2",
     "style-loader": "^0.13.1",
-    "webpack": "^2.2.1"
+    "webpack": "^2.2.1",
+    "webpack-dev-server": "^2.3.0"
   },
   "dependencies": {
-    "react": "^15.4.2"
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2"
   }
 }

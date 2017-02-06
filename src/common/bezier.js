@@ -1,5 +1,7 @@
-var context=document.getElementById('canvas').getContext('2d');
-var ARROW_MARGIN=30,
+import * as gv from './global.js';
+let canvas=gv.canvas,
+    context=gv.context;
+const ARROW_MARGIN=30,
     POINT_RADIUS=7,
     points=[{x:canvas.width-ARROW_MARGIN,
             y:canvas.height-ARROW_MARGIN},
@@ -9,7 +11,7 @@ var ARROW_MARGIN=30,
             {x:ARROW_MARGIN,y:canvas.height/2-ARROW_MARGIN},
             {x:canvas.width-ARROW_MARGIN,y:ARROW_MARGIN},
             {x:canvas.width-ARROW_MARGIN,y:ARROW_MARGIN*2}];
-var endPoints=[{x:130,y:70},{x:430,y:270},{x:430,y:270}],
+const endPoints=[{x:130,y:70},{x:430,y:270},{x:430,y:270}],
     controlPoints=[{x:130,y:250},{x:450,y:70},];
 //Functions
 function drawPoint(x,y,strokeStyle,fillStyle){
@@ -99,17 +101,27 @@ function drawControlPoints(){
   });
 }
 
-context.clearRect(0,0,canvas.width,canvas.height);
-//drawPoint(points[0].x,points[0].y,'blue','yellow');
-//drawBezierPoints();
-//drawArrow();
+function drawDemo(){
+    context.clearRect(0,0,canvas.width,canvas.height);
+    //drawPoint(points[0].x,points[0].y,'blue','yellow');
+    //drawBezierPoints();
+    //drawArrow();
 
-drawControlPoints();
-drawEndPoints();
-drawBezierCurve();
+    drawControlPoints();
+    drawEndPoints();
+    drawBezierCurve();
 
+}
 
-
+export {
+    drawPoint,
+    drawBezierPoints,
+    drawArrow,
+    drawBezierCheck,
+    drawEndPoints,
+    drawControlPoints,
+    drawDemo
+}
 
 
 

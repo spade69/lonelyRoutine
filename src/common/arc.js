@@ -1,6 +1,9 @@
-var context=document.getElementById('canvas').getContext('2d');
-
-var CENTROID_RADIUS=10,
+//context canvas default global variable
+//var context=document.getElementById('canvas').getContext('2d');
+import * as gv from './global.js';
+let canvas=gv.canvas,
+    context=gv.context;
+const CENTROID_RADIUS=10,
     CENTROID_STROKE_STYLE='rgb(0,0,0,0.5)',
     CENTROID_FILL_STYLE='rgba(80,190,240,0.6)',
 
@@ -127,21 +130,7 @@ function drawTicks(){
   context.restore();
 }
 
-//number on the clock
-function drawAnnotations(){
-  var radius=circle.radius+RING_INNER_RADIUS;
-  context.save();
-  context.fillStyle=ANNOTATIONS_FILL_STYLE;
-  context.font=ANNOTATIONS_TEXT_SIZE+'px Helvetica';
-  for(var angle=0;angle<2*Math.PI;angle+=Math.PI/8){
-    context.beginPath();
-    context.fillText((angle*180/Math.PI).toFixed(0),
-                    circle.x+Math.cos(angle)*(radius-TICK_WIDTH*2),
-                    circle.y-Math.sin(angle)*(radius-TICK_WIDTH*2));
-  }
-  context.restore();
 
-}
 
 function drawRubberbandShape(loc){
   var angle,
@@ -193,14 +182,31 @@ function drawRoundedRect(strokeStyle,fillStyle,cornerX,cornerY,width,height,corn
   context.fill();
 }
 
-//drawRoundedRect('blue','yellow',50,40,100,100,10);
-context.shadowColor='rgba(0,0,0,0.4)';
-context.shadowOffsetX=2;
-context.shadowOffsetY=2;
-context.shadowBlur=4;
-context.textAlign='center';
-context.textBaseline='middle';
-//drawGrid('lightgray',10,10);
-drawDial();
+function drawDemo(){
+  //drawRoundedRect('blue','yellow',50,40,100,100,10);
+  context.shadowColor='rgba(0,0,0,0.4)';
+  context.shadowOffsetX=2;
+  context.shadowOffsetY=2;
+  context.shadowBlur=4;
+  context.textAlign='center';
+  context.textBaseline='middle';
+  //drawGrid('lightgray',10,10);
+  drawDial();
 
+}
 
+//export default drawDemo;
+export {
+  drawDial,
+  drawCentroid,
+  drawCentroidGuidewire,
+  drawRing,
+  drawRingOuterCircle,
+  drawTickInnerCircle,
+  drawTick,
+  drawTicks,
+  drawRubberbandShape,
+  roundedRect,
+  drawRoundedRect,
+  drawDemo
+};

@@ -3,6 +3,8 @@
   select compoent
 * */
 import React from 'react';
+import ReactDOM from 'react-dom';
+
 
 function OptionItem(props){
   return <option>{props.value}</option>;
@@ -54,10 +56,10 @@ class FlavorForm extends React.Component{
     );
   }
 }
-
+/*
 ReactDOM.render(
 <FlavorForm /> ,
 document.getElementById('root')
-);
+);*/
 
 

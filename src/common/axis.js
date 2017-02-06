@@ -1,6 +1,13 @@
-var canvas=document.getElementById('canvas'),
-    context=canvas.getContext('2d'),
-    AXIS_MARGIN=40,
+/**
+ * [draw line tool function]
+ * @type {[type]}
+ * There variable defined here are local variables , they are hidden
+ */
+import * as gv from './global.js';
+let canvas=gv.canvas,
+    context=gv.context;
+//const  , you cannot change at runtime
+const AXIS_MARGIN=40,
     AXIS_ORIGIN={x:AXIS_MARGIN,y:canvas.height-AXIS_MARGIN},
     AXIS_TOP=AXIS_MARGIN,
     AXIS_RIGHT=canvas.width-AXIS_MARGIN,
@@ -22,28 +29,6 @@ var canvas=document.getElementById('canvas'),
     AXIS_COLOR='blue';
 
 //function
-function drawGrid(color,stepx,stepy){
-  //listing omitted for brevity .
-  //for a complete listing.
-  context.strokeStyle=color;
-  context.lineWidth=0.5;
-
-  for(var i=stepx+0.5;i<context.canvas.width;i+=stepx){
-    context.beginPath();
-    context.moveTo(i,0);
-    context.lineTo(i,context.canvas.height); //canvas.height ! vertical line
-    context.stroke();
-  }
-
-  for(var i=stepy+0.5;i<context.canvas.height;i+=stepy){
-    context.beginPath();
-    context.moveTo(0,i);
-    context.lineTo(context.canvas.width,i);
-    context.stroke();
-  }
-
-}
-
 function drawAxes(){
   context.save();
   context.strokeStyle=AXIS_COLOR;
@@ -120,7 +105,7 @@ function drawDashedLine(context,x1,y1,x2,y2,dashLength){
   context.stroke();
 };
 
-function main(context){
+function drawDemo(){
   context.lineWidth=3;
   context.strokeStyle='blue';
   drawDashedLine(context,20,20,context.canvas.width-20,20);
@@ -130,19 +115,19 @@ function main(context){
   context.canvas.height-20,20,context.canvas.height-20,15);
 
   //Initialization...
-  drawGrid('lightgray',10,10);
+  //drawGrid('lightgray',10,10);
   drawAxes();
 }
 
-module.exports={
-  drawGrid:drawGrid,
-  drawAxes:drawAxes,
-  drawHorizontalAxis:drawHorizontalAxis,
-  drawVerticalAxis:drawVerticalAxis,
-  drawVerticalAXisTicks:drawVerticalAXisTicks,
-  drawHorizontalAxisTicks:drawHorizontalAxisTicks,
-  drawDashedLine:drawDashedLine
-}
+export {
+  drawAxes,
+  drawHorizontalAxis,
+  drawVerticalAxis,
+  drawVerticalAXisTicks,
+  drawHorizontalAxisTicks,
+  drawDashedLine,
+  drawDemo
+};
 
 
 

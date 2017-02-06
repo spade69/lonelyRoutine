@@ -1,10 +1,11 @@
-var canvas=document.getElementById('canvas'),
-    context=canvas.getContext('2d'),
-    shadowCheckbox=document.getElementById('shadowCheckbox'),
-    fontHeight=24,
+import * as gv from './global.js';
+let canvas=gv.canvas,
+    context=gv.context,
+    shadowCheckbox=gv.shadowCheckbox,
+    x,y;
+const fontHeight=24,
     alignValues=['start','center','end'],
     baselineValues=['top','middle','bottom','alphabetic','ideographic','hanging'],
-    x,y,
     text='HTML5',
     VERTICAL_TICK_SPACING=10,
     HORIZONTAL_TICK_SPACING=10,
@@ -70,13 +71,13 @@ function turnShadowsOff(){
   context.shadowBlur=0;
 }
 
-function drawText(){
+/*function drawText(){
   var TEXT_X=65,TEXT_Y=canvas.height/2+35;
   context.strokeStyle='blue';
 //  if()
   context.fillText(text,TEXT_X,TEXT_Y);
   context.strokeText(text,TEXT_X,TEXT_Y);
-}
+}*/
 
 function drawTextMarker(){
   context.fillStyle='yellow';
@@ -120,6 +121,7 @@ function drawHorizontalAxisLabels(){
   }
 }
 
+// vertical Axis Labels
 function drawVerticalAxisLabels(){
   context.textAlign='right';
   context.textBaseline='middle';
@@ -131,7 +133,8 @@ function drawVerticalAxisLabels(){
   }
 }
 
-function drawDegreeAnnotatioons(){
+//Annotations  //number on the clock
+function drawAnnotatioons(){
   var radius=circle.radius+DEGREE_DIAL_MARGIN;
   context.save();
   context.fillStyle=DEGREE_ANNOTATIONS_FILL_STYLE;
@@ -172,24 +175,42 @@ function drawCircularText(string,startAngle,endAngle){
   }
 }
 
-//context.font='128px Palatino';
-context.font='oblique normal bold 24px palatino';
-/*
-context.lineWidth=1.0;
-context.fillStyle='cornflowerblue';
-turnShadowsOn();
-draw();
-*/
-for(var align=0;align<alignValues.length;++align){
-  for(var baseline=0;baseline<baselineValues.length;++baseline){
-    x=20+align*fontHeight*15;
-    y=20+baseline*fontHeight*3;
-    drawText(alignValues[align]+'/'+baselineValues[baseline],
-            alignValues[align],baselineValues[baseline]);
-    drawTextMarker();
-    drawTextLine();
-  }
+
+function drawDemo(){
+    //context.font='128px Palatino';
+    context.font='oblique normal bold 24px palatino';
+    /*
+    context.lineWidth=1.0;
+    context.fillStyle='cornflowerblue';
+    turnShadowsOn();
+    draw();
+    */
+    for(var align=0;align<alignValues.length;++align){
+      for(var baseline=0;baseline<baselineValues.length;++baseline){
+        x=20+align*fontHeight*15;
+        y=20+baseline*fontHeight*3;
+        drawText(alignValues[align]+'/'+baselineValues[baseline],
+                alignValues[align],baselineValues[baseline]);
+        drawTextMarker();
+        drawTextLine();
+      }
+    }
+
+    drawCircularText("clockwise around the circle",Math.PI*2,Math.PI/8);
 }
 
-drawCircularText("clockwise around the circle",Math.PI*2,Math.PI/8);
-
+export {
+  draw,
+  drawBackground,
+  turnShadowsOn,
+  turnShadowsOff,
+  drawText,
+  drawTextLine,
+  drawTextMarker,
+  drawMiddleText,
+  drawHorizontalAxisLabels,
+  drawVerticalAxisLabels,
+  drawAnnotatioons,
+  drawCircularText,
+  drawDemo
+}

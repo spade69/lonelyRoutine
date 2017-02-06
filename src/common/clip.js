@@ -1,11 +1,21 @@
-var canvas=document.getElementById('canvas'),
-    context=canvas.getContext('2d'),
+import * as gv from './global.js';
+import {windowToCanvas,drawGrid} from './basic';
+let canvas=gv.canvas,
+    context=gv.context,
+    drawingSurfaceImageData,
+    lastX,
+    lastY,
+    mousedown={},
+    rubberbandRect={},
+    dragging=false,
     eraserWidth=200,
     eraserShape='circle',
-    drawRadio=document.getElementById('drawRadio'),
-    eraseRadio=document.getElementById('eraserRadio'),
+    guidewires=true;
+    
+  //  drawRadio=document.getElementById('drawRadio'),
+  //  eraseRadio=document.getElementById('eraserRadio'),
 
-    ERASER_LINE_WIDTH=1,
+const ERASER_LINE_WIDTH=1,
     ERASER_SHADOW_COLOR='rgb(0,0,0)',
     ERASER_SHADOW_STYLE='blue',
     ERASER_STROKE_STYLE='rgb(0,0,255)',
@@ -15,55 +25,23 @@ var canvas=document.getElementById('canvas'),
     GRID_HORIZONTAL_SPACING=10,
     GRID_VERTICAL_SPACING=10,
     GRID_LINE_COLOR='lightblue',
-    drawingSurfaceImageData,
-
-    lastX,
-    lastY,
-    mousedown={},
-    rubberbandRect={},
-    dragging=false,
-    guidewires=true;
-
-
-function drawGrid(color,stepx,stepy){
-  //listing omitted for brevity .
-  //for a complete listing.
-  context.strokeStyle=color;
-  context.lineWidth=0.5;
-
-  for(var i=stepx+0.5;i<context.canvas.width;i+=stepx){
-    context.beginPath();
-    context.moveTo(i,0);
-    context.lineTo(i,context.canvas.height); //canvas.height ! vertical line
-    context.stroke();
-  }
-
-  for(var i=stepy+0.5;i<context.canvas.height;i+=stepy){
-    context.beginPath();
-    context.moveTo(0,i);
-    context.lineTo(context.canvas.width,i);
-    context.stroke();
-  }
-
-}
 
 
 
-function windowToCanvas(x,y){
-  var bbox=canvas.getBoundingClientRect();
-  return {x:x-bbox.left*(canvas.width/bbox.width),
-          y:y-bbox.top*(canvas.height/bbox.height)};
-}
 
 //Save and restore drawing surface! ..
 function saveDrawingSurface(){
   //getImageData!
-  drawingSurfaceImageData=context.getImageData(0,0,canvas.width,canvas.height);
+  if(drawingSurfaceImageData)
+    drawingSurfaceImageData=context.getImageData(0,0,canvas.width,canvas.height);
 }
 
 function restoreDrawingSurface(){
-  context.putImageData(drawingSurfaceImageData,0,0);
+    if(drawingSurfaceImageData)
+        context.putImageData(drawingSurfaceImageData,0,0);
 }
+
+
 
 //Rubber bands
 function updateRubberbandRectangle(loc){
@@ -91,28 +69,9 @@ function updateRubberband(loc){
 }
 
 //Guidewires
-function drawHorizontalLine(y){
-  context.beginPath();
-  context.moveTo(0,y+0.5);
-  context.lineTo(context.canvas.width,y+0.5);
-  context.stroke();
-}
 
-function drawVerticalLine(x){
-  context.beginPath();
-  context.moveTo(x+0.5,0);
-  context.lineTo(x+0.5,context.canvas.height);
-  context.stroke();
-}
 
-function drawGuidewires(x,y){
-  context.save(); //save drawing surface and then draw guidewire!!!!!
-  context.strokeStyle='rgba(0,0,230,0.4)';
-  context.lineWidth=0.5;
-  drawVerticalLine(x);
-  drawHorizontalLine(y);
-  context.restore();
-}
+
 
 
 //Eraser...
