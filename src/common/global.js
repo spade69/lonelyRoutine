@@ -1,5 +1,10 @@
 var canvas=document.getElementById('canvas'),
     context=canvas.getContext('2d'),
-    shadowCheckbox=document.getElementById('shadowCheckbox');
+    offscreenCanvas=document.createElement('canvas'),
+    offscreenContext=offscreenCanvas.getContext('2d');
 
-export {canvas,context,shadowCheckbox};
+export {
+	canvas,context,
+	offscreenCanvas,
+	offscreenContext
+};

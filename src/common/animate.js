@@ -1,8 +1,10 @@
-var canvas=document.getElementById('canvas'),
-    context=canvas.getContext('2d'),
-    offscreenCanvas=document.createElement('canvas'),
-    offscreenContext=offscreenCanvas.getContext('2d'),
-    paused=true,
+import * as gv from './global.js';
+import requestNextAnimationFrame from '../lib/requestNextAnimationFrame';
+const SKY_VELOCITY=8,
+    TREE_VELOCITY=20,
+    GRASS_VELOCITY=75,
+    FAST_TREE_VELOCITY=40,
+    fps=120,
     discs=[
       {
         x:150,
@@ -46,58 +48,38 @@ var canvas=document.getElementById('canvas'),
 
       },
 
-    ],
+    ];
+
+
+let canvas=gv.canvas,
+    context=gv.context,
+    offscreenCanvas=gv.offscreenCanvas,
+    offscreenContext=gv.offscreenContext,
+    paused=true,
+    //Gesture
+    animating=false,
+    dragging=false,
+    mousedown=null,
+    mouseup=null,
+
     numDiscs=discs.length,
     lastTime=0,
     lastFpsUpdateTime=0,
     lastFpsUpdate={time:0,value:0},
-    animationButton=document.getElementById('animateButton'),
+    //animationButton=document.getElementById('animateButton'),
     tree=new Image(),
     nearTree=new Image(),
     grass=new Image(),
     grass2=new Image(),
     sky=new Image(),
-    fps=120,
+    
     skyOffset=0,
     grassOffset=0,
     treeOffset=0,
-    nearTreeOffset=0,
-    SKY_VELOCITY=8,
-    TREE_VELOCITY=20,
-    GRASS_VELOCITY=75,
-    FAST_TREE_VELOCITY=40,
-//Gesture
-    animating=false,
-    dragging=false,
-    mousedown=null,
-    mouseup=null
-    ;
+    nearTreeOffset=0;    
 
 //Function
 //
-function drawBackground(){ //Ruled paper
-  var STEP_Y=12,
-      TOP_MARGIN=STEP_Y*4,
-      LEFT_MARGIN=STEP_Y*3,
-      i=context.canvas.height;
-  //
-  context.strokeStyle='lightgray';
-  context.lineWidth=0.5;
-  while(i>TOP_MARGIN){
-    context.beginPath();
-    context.moveTo(0,i);
-    context.lineTo(context.canvas.width,i);
-    context.stroke();
-    i-=STEP_Y;
-  }
-  //Vertical line
-  context.strokeStyle='rgba(100,0,0,0.3)';
-  context.lineWidth=1;
-  context.beginPath();
-  context.moveTo(LEFT_MARGIN,0);
-  context.lineTo(LEFT_MARGIN,context.canvas.height);
-  context.stroke();
-}
 
 
 function update(){
@@ -149,6 +131,53 @@ function calculateFps(){
   return fps;
 }
 
+//Frame rate timebased
+function updateTimeBased(time){
+  var disc=null,
+      elapsedTime=time-lastTime,deltaX,deltaY;
+  for(var i=0;i<discs.length;i++){
+    disc=discs[i];
+    deltaX=disc.velocityX*(elapsedTime/1000);
+    deltaY=disc.velocityY*(elapsedTime/1000);
+    if(disc.x+deltaX+disc.radius>context.canvas.width||
+        disc.x+deltaX-disc.radius<0){
+          disc.velocityX=-disc.velocityX;
+          deltaX=-deltaX;
+        }
+    if(disc.y+deltaY+disc.radius>context.canvas.height||
+        disc.y+deltaY-disc.radius<0)
+      disc.velocityY=-disc.velocityY;
+      deltaY=-deltaY;
+  }
+  disc.x=disc.x+deltaX;
+  disc.y=disc.y+deltaY;
+}
+
+
+function drawBackground(){ //Ruled paper
+  var STEP_Y=12,
+      TOP_MARGIN=STEP_Y*4,
+      LEFT_MARGIN=STEP_Y*3,
+      i=context.canvas.height;
+  //
+  context.strokeStyle='lightgray';
+  context.lineWidth=0.5;
+  while(i>TOP_MARGIN){
+    context.beginPath();
+    context.moveTo(0,i);
+    context.lineTo(context.canvas.width,i);
+    context.stroke();
+    i-=STEP_Y;
+  }
+  //Vertical line
+  context.strokeStyle='rgba(100,0,0,0.3)';
+  context.lineWidth=1;
+  context.beginPath();
+  context.moveTo(LEFT_MARGIN,0);
+  context.lineTo(LEFT_MARGIN,context.canvas.height);
+  context.stroke();
+}
+
 //drawDisc
 function drawDiscBackground(disc){
   context.save();
@@ -181,76 +210,6 @@ function eraseBackground(){
   context.clearRect(0,0,canvas.width,canvas.height);
 }
 
-//Animation 
-function animateDFps(now){//different fps
-  var fps=0;
-  if(now==undefined){
-    now=+new Date();
-  }
-  if(!paused){
-    eraseBackground();
-    drawBackground();
-    update();
-    draw();
-    fps=calculateFps();
-    //once per second update the frame rate
-    if(now-lastFpsUpdateTime>1000){
-      lastFpsUpdateTime=now;
-      lastFpsUpdate=fps;
-    }
-    window.requestNextAnimationFrame(animateDFps);
-    context.fillStyle='cornflowerblue';
-    context.fillText=(lastFpsUpdate.toFixed()+'fps',50,58);
-  }
-
-}
-
-function animateFps(time){
-  context.clearRect(0,0,canvas.width,canvas.height);
-  drawBackground();
-  update();
-  draw();
-  context.fillStyle='cornflowerblue';
-  context.fillText(calculateFps().toFixed()+'fps',20,60);
-  window.requestNextAnimationFrame(animateFps);
-}
-
-//generally animate 
-function animate(now){
-  if(now===undefined){
-    now=+new Date;
-  }
-    fps=calculateFps(now);
-    if(!paused){
-        eraseBackground();
-        draw();
-    }
-    requestNextAnimationFrame(animate);
-}
-
-//window.requestNextAnimationFrame(animateFps);
-
-//Framerate timebased
-function updateTimeBased(time){
-  var disc=null,
-      elapsedTime=time-lastTime,deltaX,deltaY;
-  for(var i=0;i<discs.length;i++){
-    disc=discs[i];
-    deltaX=disc.velocityX*(elapsedTime/1000);
-    deltaY=disc.velocityY*(elapsedTime/1000);
-    if(disc.x+deltaX+disc.radius>context.canvas.width||
-        disc.x+deltaX-disc.radius<0){
-          disc.velocityX=-disc.velocityX;
-          deltaX=-deltaX;
-        }
-    if(disc.y+deltaY+disc.radius>context.canvas.height||
-        disc.y+deltaY-disc.radius<0)
-      disc.velocityY=-disc.velocityY;
-      deltaY=-deltaY;
-  }
-  disc.x=disc.x+deltaX;
-  disc.y=disc.y+deltaY;
-}
 //roll
 function drawRoll(){
   context.save();
@@ -303,6 +262,64 @@ function drawMultipleLayer(){
   context.restore();
 }
 
+//Gesture
+function didThrow(){
+  var elapsedTime=mouseup.time-mousedown.time;
+  var elapsedMotion=Math.abs(mouseup.x-mousedown.x)+
+                    Math.abs(mouseup.y-mousedown.y);
+  return (elapsedMotion/elapsedTime*10)>3;
+}
+
+
+//Animation 
+function animateDFps(now){//different fps
+  var fps=0;
+  if(now==undefined){
+    now=+new Date();
+  }
+  if(!paused){
+    eraseBackground();
+    drawBackground();
+    update();
+    draw();
+    fps=calculateFps();
+    //once per second update the frame rate
+    if(now-lastFpsUpdateTime>1000){
+      lastFpsUpdateTime=now;
+      lastFpsUpdate=fps;
+    }
+    window.requestNextAnimationFrame(animateDFps);
+    context.fillStyle='cornflowerblue';
+    context.fillText=(lastFpsUpdate.toFixed()+'fps',50,58);
+  }
+
+}
+
+function animateFps(time){
+  context.clearRect(0,0,canvas.width,canvas.height);
+  drawBackground();
+  update();
+  draw();
+  context.fillStyle='cornflowerblue';
+  context.fillText(calculateFps().toFixed()+'fps',20,60);
+  window.requestNextAnimationFrame(animateFps);
+}
+
+//generally animate 
+function animate(now){
+  if(now===undefined){
+    now=+new Date;
+  }
+    fps=calculateFps(now);
+    if(!paused){
+        eraseBackground();
+        draw();
+    }
+    requestNextAnimationFrame(animate);
+}
+
+
+
 function animateLayer(now){
   if(now===undefined){
     now=+new Date;
@@ -317,14 +334,45 @@ function animateLayer(now){
   requestNextAnimationFrame(animateLayer);//passing callback (itself)
 }
 
-//Gesture
-function didThrow(){
-  var elapsedTime=mouseup.time-mousedown.time;
-  var elapsedMotion=Math.abs(mouseup.x-mousedown.x)+
-                    Math.abs(mouseup.y-mousedown.y);
-  return (elapsedMotion/elapsedTime*10)>3;
+
+
+function testDemo(treeUrl){
+  context.font='48px Helvetica';
+
+  tree.src=treeUrl.tree;
+  nearTree.src=treeUrl.nearTree;
+  grass.src=treeUrl.grass;
+  grass2.src=treeUrl.grass2;
+  sky.src=treeUrl.sky;
+  sky.onload=function(e){
+    drawMultipleLayer();
+  };
+
+  requestNextAnimationFrame(animateLayer);
+
 }
 
+export {
+    draw,
+    drawBackground,
+    drawDiscBackground,
+    drawDiscBackgroundOff,
+    eraseBackground,
+
+    update,
+    updateTimeBased,
+    calculateFps,
+    drawRoll,
+    drawMultipleLayer,
+    didThrow,
+    animateDFps,
+    animateFps,
+    animate,
+    animateLayer,
+    testDemo
+}
+
+/*
 //Event handler
 animateButton.onclick=function(e){
   paused=paused?false:true;
@@ -337,6 +385,7 @@ animateButton.onclick=function(e){
   }
 };
 
+ 
 canvas.onmousedown=function(e){
   var mouse=windowToCanvas(e.clientX,e.clientY);
   mousedown={x:mouse.x,y:mouse.y,time:(new Date).getTime()};
@@ -356,23 +405,5 @@ canvas.onmousemove=function(e){
     eraseMagnifyGlass();
     drawMagnifyingGlass(windowToCanvas());
   }
-}
-
-canvas.onmouseup=function(e){
-
-}
-
-context.font='48px Helvetica';
-
-tree.src='img/smalltree.png';
-nearTree.src='img/tree-twotrunks.png';
-grass.src='img/grass.png';
-grass2.src='img/grass2.png';
-sky.src='img/sky.png';
-sky.onload=function(e){
-  drawMultipleLayer();
-};
-
-requestNextAnimationFrame(animateLayer);
-
+}*/
 

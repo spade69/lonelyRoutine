@@ -5,6 +5,8 @@ var gulp=require('gulp'),
     concat = require('gulp-concat'),
     cssnano = require('gulp-cssnano'),
     autoprefixer=require('gulp-autoprefixer'),
+    imagemin=require('gulp-imagemin'),
+    cache=require('gulp-cache'),
     webpack=require('gulp-webpack');
 
 gulp.task('styles', function() {
@@ -22,9 +24,17 @@ gulp.task('styles', function() {
 });
 
 gulp.task('scripts',function(cb){
-    return gulp.src('app/entry.js')
+    return gulp.src('src/entry.js')
             .pipe(webpack(require('./webpack.config.js')))
             .pipe(gulp.dest('dist'));
+});
+
+//image
+gulp.task('images',function(){
+    return gulp.src('img/**/*.{png,jpg,gif,ico}')
+        .pipe(cache(imagemin({optimizationLevel:5,progressive:true,interlaced:true})))
+        .pipe(gulp.dest('dist/public'))
+        
 });
 
 gulp.task('watch',function(){

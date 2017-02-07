@@ -1,31 +1,30 @@
-var canvas=document.getElementById('canvas'),
-    context=canvas.getContext('2d'),
-    image=new Image(),
-    scaleOutput=document.getElementById('scaleOutput'),
+import * as gv from './global.js';
+let canvas=gv.canvas,
+    context=gv.context,
+    offscreenCanvas=gv.offscreenCanvas,
+    offscreenContext=gv.offscreenContext,
+   image=new Image(),
+/*    scaleOutput=document.getElementById('scaleOutput'),
     scaleSlider=document.getElementById('scaleSlider'),
     scale=scaleSlider.value,
-    scale=1.0, //initialize
-    MINIMUM_SCALE=1.0,
-    MAXIMUM_SCALE=3.0,
-    sunglassButton=document.getElementById('sunglassButton')  ,
-    sunglassesOn=false,
-    sunglassFilter=new Worker('sunglassFilter.js'),
-    LENS_RADIUS=canvas.width/5,
-
-    offscreenCanvas=document.createElement('canvas'),
-    offscreenContext=offscreenCanvas.getContext('2d'),
+    scale=1.0, //initialize*/
 //getimage data
     imageData=context.getImageData(0,0,canvas.width,canvas.height),
-    data=imageData.data,
     imagedataOffscreen,
     interval=null,
-    length=imageData.data.length,
-    width=imageData.width,
     index=0,
+    magnifyRectangle={},
     value;
 
+const MINIMUM_SCALE=1.0,
+    MAXIMUM_SCALE=3.0,
+    LENS_RADIUS=canvas.width/5,
+    magnifyingGlassX = 512,
+    magnifyingGlassY = 340,
+    magnifyingGlassRadius=120,
+    magnificationScale=1.2;
 //Function
-function drawScaled(){
+function drawScaled(scale){
   var w=canvas.width,
       h=canvas.height,
       sw=w*scale,
@@ -43,22 +42,13 @@ function drawScaled(){
 }
 
 
-function drawScaledX(){
+function drawScaledX(scale){
   var w=canvas.width,
       h=canvas.height,
       sw=w*scale,
       sh=h*scale;
   context.drawImage(offscreenCanvas,0,0,offscreenCanvas.width,
                     offscreenCanvas.height,-sw/2+w/2,-sh/2+h/2,sw,sh) ;
-}
-
-function drawScaleText(value){
-  var text=parseFloat(value).toFixed(2);
-  var percent=parseFloat(value-MINIMUM_SCALE)/
-              parseFloat(MAXIMUM_SCALE-MINIMUM_SCALE);
-  scaleOutput.innerText=text;
-  percent=percent<0.35?0.35:percent;
-  scaleOutput.style.fontSize=percent*MAXIMUM_SCALE/1.5+'em';
 }
 
 function drawWatermark(){
@@ -87,30 +77,13 @@ function drawWatermark(){
   context.restore();
 }
 
-function iteration(){
-  //iterate every pixel
-  for(var index=0;index<length;index++){
-    value=data[index];
-  }
-
-  //reverse iteration
-  for(index=length-1;index>=0;index--){
-    value=data[index];
-  }
-  //only prcess alpha ,not modifiying RGB
-  for(index=3;index<=length-4;index+=4){
-    //data[index]=...;//
-  }
-
-}
-
 //filter
 function drawInBlackAndWhite(){
   var data=undefined,i=0;
   imageData=context.getImageData(0,0,canvas.width,canvas.height);
   data=imageData.data;
   for(i=0;i<data.length-4;i+=4){
-    average=(data[i]+data[i+1]+data[i+2])/3;
+    let average=(data[i]+data[i+1]+data[i+2])/3;
     data[i]=average;
     data[i+1]=average;
     data[i+2]=average;
@@ -118,25 +91,7 @@ function drawInBlackAndWhite(){
   context.putImageData(imageData,0,0);
 }
 
-function drawInColor(){
-  context.drawImage(image,0,0,image.width,image.height,0,0,
-                    context.canvas.width,context.canvas.height);
-}
-
-function emboss(){
-  var imagedata,data,length,width;
-  imagedata=context.getImageData(0,0,canvas.width,canvas.height);
-  data=imagedata.data;
-  width=imagedata.width;
-  length=data.length;
-  for(i=0;i<length;i++){
-    if((i+1)%4!==0){
-
-    }
-  }
-}
-
-function drawOriginalImage() {
+function drawOriginalImage(image) {
   context.drawImage(image,0,0,image.width,image.height,
                     0,0,canvas.width,canvas.height);
 }
@@ -156,6 +111,7 @@ function drawLenses(leftLensLocation,rightLensLocation){
   context.restore();
 
 }
+
 
 function drawWire(center){
   context.beginPath();
@@ -181,35 +137,19 @@ function drawConnectors(center){
   context.stroke();
 }
 
-//sunglass filter main js
-function putSunglassesOn(){
-  var imagedata,
-    center={x:canvas.width/2,y:canvas.height/2},
-    leftLensLocation={x:center.x-LENS_RADIUS-10,y:center.y},
-    rightLensLocation={x:center.x+LENS_RADIUS+10,y:center.y};
-  sunglassFilter.postMessage(
-                context.getImageData(0,0,canvas.width,canvas.height));
-//message event
-  sunglassFilter.onmessage=function(event){
-    offscreenContext.putImageData(event.data,0,0);
-    drawLenses(leftLensLocation,rightLensLocation);
-    drawWire(center);
-    drawConnectors(center);
-  };
-}
 
 //animate
-function increaseTransparency(imagedata,steps){
-  var alpha,currentAplpha,step,length=imagedata.data.length;
+function increaseTransparency(steps){
+  var alpha,currentAplpha,step,length=imageData.data.length;
   for(var i=3;i<length;i+=4){//For every alpha component
     alpha=imagedataOffscreen.data[i];
     if(alpha>0){
-      currentAplpha=imagedata.data[i];
+      currentAplpha=imageData.data[i];
       step=Math.ceil(alpha/steps);
       if(currentAplpha+step<=alpha){//Not at original alpha yet
-        imagedata.data[i]+=step; //Increase transparency
+        imageData.data[i]+=step; //Increase transparency
       }else{
-        imagedata.data[i]=alpha; //
+        imageData.data[i]=alpha; //
       }
     }
   }
@@ -245,23 +185,16 @@ function fadeOut(context,imagedata,x,y,steps,millisecondsPerStep){
   },millisecondsPerStep);
 }
 
-//animation
-function animationComplete(){
-  setTimeout(function(){
-    context.clearRect(0,0,canvas.width,canvas.height);
-  },1000);
-}
-
 //magnifier
 function drawMagnifyingGlass(mouse){
   var scaledMagnifyRectangle=null;
-  manifyingGlassX=mouse.x;
-  manifyingGlassY=mouse.y;
+  magnifyingGlassX=mouse.x;
+  magnifyingGlassY=mouse.y;
   calculateMagnifyRectangle(mouse);
   imageData=context.getImageData(magnifyRectangle.x,magnifyRectangle.y,
                                 magnifyRectangle.width,magnifyRectangle.height);
   context.save();
-  scaledMagnifyRectangle=={
+  scaledMagnifyRectangle={
     width:magnifyRectangle.width * magnificationScale,
     height:magnifyRectangle.height * magnificationScale
   };
@@ -277,10 +210,157 @@ function drawMagnifyingGlass(mouse){
 
 function setClip(){
   context.beginPath();
-  context.arc(manifyingGlassX,manifyingGlassY,manifyingGlassRadius,0,Math.PI*2,false);
+  context.arc(magnifyingGlassX,magnifyingGlassY,magnifyingGlassRadius,0,Math.PI*2,false);
   context.clip();
 }
 
+function drawMagnifyingGlassCircle(mouse) {
+   context.save();
+   context.lineWidth = 3;
+   context.strokeStyle = 'rgba(0, 0, 255, 0.3)';
+
+   context.shadowColor = 'rgba(0, 0, 155, 1)';
+   context.shadowOffsetX = '-10';
+   context.shadowOffsetY = '-10';
+   context.shadowBlur = '20';
+
+   context.beginPath();
+   context.arc(mouse.x, mouse.y,
+               magnifyingGlassRadius, 0, Math.PI*2, false);
+   context.clip();
+   context.shadowColor = 'cornflowerblue';
+   context.strokeStyle = 'skyblue';
+   context.stroke();
+
+   context.beginPath();
+   context.lineWidth = 1;
+   context.strokeStyle = 'rgba(100, 149, 240, 0.7)';
+   context.arc(mouse.x, mouse.y,
+               magnifyingGlassRadius-1, 0, Math.PI*2, false);
+   context.stroke();
+
+   context.beginPath();
+   context.strokeStyle = 'rgba(100, 149, 240, 0.5)';
+   context.lineWidth = 2;
+   context.arc(mouse.x, mouse.y,
+               magnifyingGlassRadius-1, 0, Math.PI*2, false);
+   context.stroke();
+
+   context.beginPath();
+   context.strokeStyle = 'rgba(255, 255, 0, 0.3)';
+   context.lineWidth = 1;
+   context.arc(mouse.x, mouse.y,
+               magnifyingGlassRadius-3, 0, Math.PI*2, false);
+   context.stroke();
+
+   context.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+   context.shadowColor = 'rgba(0, 0, 0, 0.8)';
+   context.shadowOffsetX = '10';
+   context.shadowOffsetY = '10';
+   context.shadowBlur = '20';
+   context.lineWidth = 4;
+   context.stroke();
+
+   context.lineWidth = 2;
+   context.strokeStyle = 'silver';
+   context.shadowColor = 'goldenrod';
+   context.stroke();
+
+   context.restore();
+}
+
+function calculateMagnifyRectangle(mouse) { 
+   var top,
+       left,
+       bottom,
+       right;
+   
+   magnifyRectangle.x = mouse.x - magnifyingGlassRadius;
+   magnifyRectangle.y = mouse.y - magnifyingGlassRadius;
+   magnifyRectangle.width = magnifyingGlassRadius*2 + 2*context.lineWidth;
+   magnifyRectangle.height = magnifyingGlassRadius*2 + 2*context.lineWidth;
+
+   top = magnifyRectangle.y;
+   left = magnifyRectangle.x;
+   bottom = magnifyRectangle.y + magnifyRectangle.height;
+   right = magnifyRectangle.x + magnifyRectangle.width;
+   
+   if (left < 0) {
+      magnifyRectangle.width += left;
+      magnifyRectangle.x = 0;
+   }
+   else if (right > canvas.width) {
+      magnifyRectangle.width -= right - canvas.width;
+   }
+
+   if (top < 0) {
+      magnifyRectangle.height += magnifyRectangle.y;
+      magnifyRectangle.y = 0;
+   }
+   else if (bottom > canvas.height) {
+      magnifyRectangle.height -= bottom - canvas.height;
+   }
+}
+
+
+function drawDemo(url){
+    context.fillStyle='cornflowerblue';
+    imagedataOffscreen=offscreenContext.getImageData(0,0,canvas.width,canvas.height);
+    let glassSize=10;
+    let scale=1.0;
+    let center = {
+         x: canvas.width/2,
+         y: canvas.height/2
+       },
+       leftLensLocation = {
+         x: center.x - LENS_RADIUS - 10,
+         y: center.y
+       },
+       rightLensLocation = {
+         x: center.x + LENS_RADIUS + 10,
+         y: center.y
+       }
+    offscreenCanvas.width=canvas.width;
+    offscreenCanvas.height=canvas.height;
+    image.src=url;
+    image.onload=function(e){
+      context.drawImage(image,0,0,canvas.width,canvas.height);
+      offscreenContext.drawImage(image,0,0,canvas.width,canvas.height);
+      /*drawWatermark(context);
+      drawWatermark(offscreenContext);
+      drawOriginalImage(image);
+      drawScaled(0.5);*/
+      drawInBlackAndWhite();
+      drawLenses(leftLensLocation,rightLensLocation);
+      drawWire(center);
+      drawConnectors(center);
+      //increaseTransparency(23);
+      
+      //fadeIn(context,imagedataOffscreen,50,1000/60);
+      fadeOut(context,imagedataOffscreen,50,1000/60);
+    }
+}
+
+export {
+    drawScaled,
+    drawScaledX,
+    drawWatermark,
+    drawInBlackAndWhite,
+    drawOriginalImage, //equals to drawInColor
+    drawLenses,
+    drawWire,
+    drawConnectors,
+    increaseTransparency,
+    fadeIn,
+    fadeOut,
+    drawMagnifyingGlass,
+    setClip,
+    drawMagnifyingGlassCircle,
+    calculateMagnifyRectangle,
+    drawDemo
+}
+
+/*
 sunglassButton.onclick=function(){
   if(sunglassesOn){
     sunglassButton.value='Sunglass';
@@ -301,25 +381,8 @@ scaleSlider.onchange=function(e){
   drawScaleText();
 }
 
-context.fillStyle='cornflowerblue';
 
-var glassSize=10;
-var scale=1.0;
-
-offscreenCanvas.width=canvas.width;
-offscreenCanvas.height=canvas.height;
-image.src="lovely.jpg";
-image.onload=function(e){
-  context.drawImage(image,0,0,canvas.width,canvas.height);
-  offscreenContext.drawImage(image,0,0,canvas.width,canvas.height);
-  drawWatermark(context);
-  drawWatermark(offscreenContext);
-  drawScaleText(scaleSlider.value);
-  drawOriginalImage();
-}
-
-
-
+*/
 
 
 

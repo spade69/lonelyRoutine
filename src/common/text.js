@@ -1,7 +1,6 @@
 import * as gv from './global.js';
 let canvas=gv.canvas,
     context=gv.context,
-    shadowCheckbox=gv.shadowCheckbox,
     x,y;
 const fontHeight=24,
     alignValues=['start','center','end'],

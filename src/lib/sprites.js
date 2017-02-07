@@ -134,3 +134,5 @@ SpriteAnimator.prototype={
     }
 }
 
+//图像绘制器，精灵表绘制器
+export {ImagePainter,Sprite,SpriteAnimator,SpriteSheetPainter};

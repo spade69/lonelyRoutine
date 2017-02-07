@@ -8,10 +8,7 @@ var canvas=document.getElementById('canvas'),
     rubberbandRectangle={},
     dragging=false;
 
-function windowToCanvas(x,y){
-  var bbox=canvas.getBoundingClientRect();
-  return {x:x-bbox.left,y:y-bbox.top};
-}
+
 
 function copyCanvasPixels(){
   var i=0;

@@ -31,6 +31,7 @@ Stopwatch.prototype={
 
 }
 
+/*//test
 var stopwatch=new Stopwatch(),
     secondsInput=document.getElementById('secondsInput'),
     animateButton=document.getElementById('startStopButton');
@@ -48,35 +49,6 @@ function animate(){
     redraw();
     requestNextAnimationFrame(animate);
   }
-}
+}*/
 
-//abstract a AnimationTimer Object
-AnimationTimer=function(duration){
-  this.duration=duration;
-};
-
-AnimationTimer.prototype={
-  duration:undefined,
-  stopwatch:new Stopwatch(),
-  start:function(){
-    this.stopwatch.start();
-  },
-  stop:function(){
-    this.stopwatch.stop();
-  },
-  getElapsedTime:function(){
-    var elapsedTime=this.stopwatch.getElapsedTime();//
-    if(!this.stopwatch.running)
-      return undefined;
-    else
-      return elapsedTime;
-  },
-  isRunning:function(){
-    return this.stopwatch.isRunning();
-  },
-  isOver:function(){
-    return this.stopwatch.getElapsedTime()>this.duration;
-  }
-}
-
-
+export default Stopwatch;
