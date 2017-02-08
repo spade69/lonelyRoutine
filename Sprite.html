@@ -29,6 +29,20 @@
 <body>
     <div id="readout"></div>
     <canvas id="canvas" width="500" height="250">Canvas not supported</canvas>
+    <div>
+      <input type="checkbox" id="editCheckbox" checked/>
+      <input type="checkbox" id="fillCheckbox" checked/>
+      <input type="checkbox" id="shadowCheckbox" />
+      <input type="radio" id="drawRadio" checked/>
+      <input type="radio" id="eraserRadio" checked/>
+      <input id="scaleSlider" type="range" step='0.01' value='1.0' 
+      min="1" max='3.0'/>
+      <button id='eraseAllButton'>erase</button>
+      <button id="sunglassButton">sunglass</button>
+      <button id="animateButton">startAnimation</button>
+      <button id="startStopButton">startButton</button>
+      <output id="scaleOutput">1.0</output>
+    </div>
     <script type="text/javascript" src='basic.js'></script>
 </body>
 </html>

@@ -3,9 +3,10 @@ import ReactDOM from 'react-dom';
 import {
   ListItem,
   NumberList,
+  OrderList,
   OptionItem,
   Select
-} from './components/line.jsx';
+} from './components/ListOption.jsx';
 
 //var line=require('../js/line.js');
 import * as line from './common/axis.js';
@@ -20,6 +21,14 @@ import Stopwatch from './lib/stopWatch.js';
 import AnimationTimer from './lib/AnimationTimer';
 import * as polygonObj from './lib/polygon';
 import * as behaviors from './lib/behavior';
+
+//Component
+import Audio from './components/Audio.jsx';
+import Progress from './components/ProgressBar.jsx';
+import Rank from './components/RankScore.jsx';
+import Pause from './components/Pause.jsx';
+import Score from './components/ScoreToast.jsx';
+import Over from './components/GameOver.jsx';
 
 var canvas=document.getElementById('canvas'),
     context=canvas.getContext('2d');
@@ -43,21 +52,6 @@ canvas.onmousedown=eraser.eraserdownHandler;
 canvas.onmousemove=eraser.erasermoveHandler;
 canvas.onmouseup=eraser.eraserupHandler;
 */
-//React
-const items=['red','green','blue','orange','cornflowerblue'];
-const numbers=[1,2,3,4,5];
-const treeUrl={
-	tree:'public/smalltree.png' ,
-	nearTree:'public/tree-twotrunks.png',
-	grass:'public/grass.png',
-	grass2:'public/grass2.png',
-	sky:'public/sky.png',
-};
-
-ReactDOM.render(
-  <Select items={items} />,
-  document.getElementById('root')
-);
 
 //Test img 
 //
@@ -76,6 +70,72 @@ stopx.stop();
 console.log(stopx.getElapsedTime());
 stopx.reset();
 console.log(stopx.isRunning());*/
+
+//React
+const items=['red','green','blue','orange','cornflowerblue'];
+const infos=[{url:'sd',type:'sdd'},{url:'sss',type:'qwe'}];
+const progress={title:'The Ungame',msg:'Loading...',value:'Loading Game...'};
+const rank={
+    title:'High score!',
+    add:'Add score',
+    new:'newGame',
+    items:['erd','aa','ornns','xxx']
+},
+pause={info:'Paused',start:'Click anywhere to start'},
+over={
+    title:'Game Over',
+    clear:'Clear high score',
+    button:'new game'};
+const numbers=[1,2,3,4,5];
+const treeUrl={
+    tree:'public/smalltree.png' ,
+    nearTree:'public/tree-twotrunks.png',
+    grass:'public/grass.png',
+    grass2:'public/grass2.png',
+    sky:'public/sky.png',
+};
+
+//test audio
+/*ReactDOM.render(
+  <Audio audioInfo={infos} />,
+  document.getElementById('root')
+);
+*/
+//test Progress
+// ReactDOM.render(
+//   <Progress progress={progress} />,
+//   document.getElementById('root')
+// );
+
+//test List 
+// ReactDOM.render(
+//     <OrderList items={items} />,
+//     document.getElementById('root')
+// );
+
+//test rank
+// ReactDOM.render(
+//     <Rank rank={rank} />,
+//     document.getElementById('root')
+// );
+
+//test Pause
+// ReactDOM.render(
+//     <Pause pause={pause}/>,
+//     document.getElementById('root')
+// );
+//Testing score
+// ReactDOM.render(
+//     <Score />,
+//     document.getElementById('root')
+// );
+//Test Game over
+ReactDOM.render(
+    <Over over={over} />,
+    document.getElementById('root')
+);
+
+
 
  //test 
  let animateTest=new AnimationTimer(2000,AnimationTimer.makeEaseOut(1));

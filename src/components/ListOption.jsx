@@ -1,7 +1,13 @@
-
+/**
+ * List  & Options
+ * 
+ * Date 2017/1
+ * Author Jason
+ */
+//React must be imorted! ReactDOM not 
 //
 import React from 'react';
-import ReactDOM from 'react-dom';
+
 
 function ListItem(props){
   return <li>{props.value}</li>;
@@ -16,6 +22,17 @@ function NumberList(props){
 
   return (
     <ul>{listItems}</ul>
+  );
+}
+
+function OrderList(props){
+  const items=props.items;
+  const listItems=items.map((item,index)=>
+    <ListItem key={index} value={item} />
+  );
+
+  return (
+    <ol>{listItems}</ol>
   );
 }
 
@@ -37,6 +54,7 @@ function Select(props){
 export  {
   ListItem,
   NumberList,
+  OrderList,
   OptionItem,
   Select
 };

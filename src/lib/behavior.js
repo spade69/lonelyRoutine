@@ -26,7 +26,7 @@ let animationTimer=new AnimationTimer(ANIMATION_DURATION,linear);
 
 
 let runInPlace={
-    lastAdvance,
+    lastAdvance:0.0,
     // body... 
     // passing context means that you can use this to do sth draw or others.
     execute:function(sprite,context){

@@ -5,7 +5,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-
+//因为要在Select中根据items的个数来循环渲染这个option，
+//所以每一个option单独写成一个函数了, 列表和下拉框有这个必要
+//其他不太必要
 function OptionItem(props){
   return <option>{props.value}</option>;
 }
@@ -62,4 +64,5 @@ ReactDOM.render(
 document.getElementById('root')
 );*/
 
+export {FlavorForm,Select};
 
