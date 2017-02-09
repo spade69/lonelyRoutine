@@ -1,0 +1,10 @@
+.toast {
+   background: rgba(255, 255, 255, 0.7);
+   border: thin solid skyblue;
+   -webkit-box-shadow: rgba(0,0,0,0.3) 2px 2px 4px;
+   -moz-box-shadow: rgba(100,140,230,0.5) 2px 2px 6px;
+   box-shadow: rgba(100,140,230,0.5) 2px 2px 6px;
+   -o-box-shadow: rgba(100,140,230,0.5) 2px 2px 6px;
+   position: absolute;
+   display: none;
+}

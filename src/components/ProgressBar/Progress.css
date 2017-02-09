@@ -1,0 +1,20 @@
+.root {
+   padding: 20px;
+   position: absolute;
+   left: 50px;
+   top: 180px;
+   width: 450px;
+   height: 400px;
+   display: block;
+}
+
+.title {
+   padding-left: 177px;
+   font: 16px Arial;
+}
+
+#loadingToast p {
+   margin-left: 10px;
+   margin-right: 10px;
+   color: black;
+}

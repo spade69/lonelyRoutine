@@ -33,7 +33,14 @@ module.exports={
         loaders:[
             {
                 test:/\.css$/,
-                loader:'style!css',
+                loader:'style-loader!css-loader',
+            },
+            {
+                test:/\.scss$/,
+                use:[{loader:"style-loader"}, //create style node from js strings 
+                {loader:"css-loader"}, //translate css into Commonjs
+                {loader:"sass-loader"} //compile Sass to css
+                ]
             },
             {
                 test:/\.jsx?$/,

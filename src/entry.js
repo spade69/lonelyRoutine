@@ -23,12 +23,13 @@ import * as polygonObj from './lib/polygon';
 import * as behaviors from './lib/behavior';
 
 //Component
-import Audio from './components/Audio.jsx';
+/*import Audio from './components/Audio.jsx';
 import Progress from './components/ProgressBar.jsx';
 import Rank from './components/RankScore.jsx';
 import Pause from './components/Pause.jsx';
 import Score from './components/ScoreToast.jsx';
-import Over from './components/GameOver.jsx';
+import Over from './components/GameOver.jsx';*/
+import App from './components/App.jsx';
 
 var canvas=document.getElementById('canvas'),
     context=canvas.getContext('2d');
@@ -71,7 +72,7 @@ console.log(stopx.getElapsedTime());
 stopx.reset();
 console.log(stopx.isRunning());*/
 
-//React
+//React //test data for App
 const items=['red','green','blue','orange','cornflowerblue'];
 const infos=[{url:'sd',type:'sdd'},{url:'sss',type:'qwe'}];
 const progress={title:'The Ungame',msg:'Loading...',value:'Loading Game...'};
@@ -85,7 +86,15 @@ pause={info:'Paused',start:'Click anywhere to start'},
 over={
     title:'Game Over',
     clear:'Clear high score',
-    button:'new game'};
+    button:'new game'},
+app={
+    progress:progress,
+    pause:pause,
+    over:over,
+    rank:rank,
+    infos:infos
+};
+
 const numbers=[1,2,3,4,5];
 const treeUrl={
     tree:'public/smalltree.png' ,
@@ -130,11 +139,14 @@ const treeUrl={
 //     document.getElementById('root')
 // );
 //Test Game over
+// ReactDOM.render(
+//     <Over over={over} />,
+//     document.getElementById('root')
+// );
 ReactDOM.render(
-    <Over over={over} />,
+    <App app={app}/>,
     document.getElementById('root')
 );
-
 
 
  //test 

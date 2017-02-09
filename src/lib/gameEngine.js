@@ -33,11 +33,11 @@ let Game=function(gameName,canvasId){
     this.HIGH_SCORES_SUFFIX='Scores';
     //Image loading
     //
-    this.imgaeLoading ProgressCallback;
+    this.imgaeLoadingProgressCallback;
     this.image={};
     this.imageUrls=[];
     this.imagesLoaded=0;
-    this.imagesFailedToLoad=0l
+    this.imagesFailedToLoad=0;
     this.imagesIndex=0;
 
     //Time
@@ -240,6 +240,18 @@ Game.prototype={
     },
     //High scores
     //
+    
+    getHighScores:function(){
+        let key=this.gameName+this.HIGH_SCORES_SUFFIX,
+            highScoresString=localStorage[key];
+    
+        if(highScoresString==undefined){
+            localStorage[key]=JSON.stringify([]);
+        }
+        return JSON.parse(localStorage[key]);
+    },
+
+
     setHighScore:function(highScore){
         let key=this.gameName+this.HIGH_SCORES_SUFFIX,
             highScoresString=localStorage[key]; //HTML5 localStorage
@@ -280,7 +292,7 @@ Game.prototype={
             key=undefined;
         switch(e.keyCode){//choose which key it is 
             //Add more keys as needed
-            case 32: key='space' break;
+            case 32: key='space'; break;
             case 68: key='d'; break;
             case 75:key='k' ; break;
             case 83:key='s' ; break;
@@ -364,3 +376,4 @@ Game.prototype={
     }
 };
 
+export default Game;

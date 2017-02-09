@@ -5,9 +5,16 @@
  * Author Jason
  */
 import React from 'react';
+//import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import './Progress.scss';
 
-
-const s={root:'ss',title:'xxx'};//should replace as .css
+const s={
+    root:'Progress-root',
+    title:'Progress-title',
+    button:'Progress-button',
+    progress:'Progress-Div',
+    msg:'Progress-Msg'
+};//should replace as .css
 //div 
 // -- title 
 // -- start loading button
@@ -16,9 +23,9 @@ const s={root:'ss',title:'xxx'};//should replace as .css
 
 function LoadButton(props){
     return(
-        <span>
+        <span className={s.button}>
             <input type='button' value={props.progress.value} autoFocus='true'/>
-            <span>{props.progress.msg}</span>
+            <span className={s.msg}>{props.progress.msg}</span>
         </span>
     );
 }
@@ -34,7 +41,7 @@ class progressBar extends React.Component{
             <div className={s.root}>
                 <span className={s.title}>{this.props.progress.title}</span>
                 <LoadButton progress={this.props.progress}/>
-                <div></div>
+                <div className={s.progress}></div>
             </div>
         );
     }

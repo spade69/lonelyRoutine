@@ -1,0 +1,30 @@
+.highScoreList {
+   color: rgba(0,0,255,0.6);
+}
+
+.highScoreParagraph {
+   position: absolute;
+   left: 150px;
+   top: -50px;
+   color: red;
+   font: 8em fantasy;
+   margin-left: 70px;
+   margin-bottom: 50px;
+}
+      
+.highScoreToast {
+   display:none;
+   width:400px;
+   position: absolute;
+   left: 0px;
+   top: 200px;
+   color: cornflowerblue;
+   margin-left: 150px;
+   margin-top: 20px;
+   font: 18px fantasy;
+}
+
+.previousHighScoresTitle {
+   margin-top: 50px;
+}
+

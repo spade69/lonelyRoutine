@@ -1,0 +1,45 @@
+.Progress-root {
+   padding: 20px;
+   position: absolute;
+   left: 50px;
+   top: 180px;
+   width: 450px;
+   height: 400px;
+   display: block;
+}
+
+.Progress-title {
+   padding:{ 
+      left:177px;
+   };
+   font: 16px Arial;
+}
+
+.Progress-root p {
+   margin-left: 10px;
+   margin-right: 10px;
+   color: black;
+}
+
+.Progress-button {
+   position: absolute;
+   left: 200px;
+   padding-top: 20px;
+}
+
+.Progress-Div {
+   padding-left: 60px;
+   padding-top: 45px;
+}
+
+.Progress-Msg {
+   display: none;
+   font: 13px Helvetica;
+   padding-left: 20px;
+} 
+
+.blurb {
+   padding: 10px;
+   display: block;
+   font: 12px Arial;
+}

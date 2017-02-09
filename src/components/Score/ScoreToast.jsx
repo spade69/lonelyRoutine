@@ -8,11 +8,11 @@
  */
 
 import React from 'react';
-
+import './Score.scss';
 
 
 //only div
-const s={toast:'xxx'};
+const s={toast:'toast'};
 
 class ScoreToast extends React.Component{
     constructor(props){
