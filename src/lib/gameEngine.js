@@ -181,6 +181,7 @@ Game.prototype={
  // Update the frame rate, based on the amount of time it took
    // for the last animation frame only.
     updateFrameRate:function(time){
+        //Here calculate the fps!
         if (this.lastTime===0)
             this.fps=this.STARTING_FPS;
         else

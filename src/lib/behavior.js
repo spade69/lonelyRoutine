@@ -61,6 +61,25 @@ moveRightToLeft={
     }
 
 },
+fallOnLedge={
+    ballWillHitLedge:function(sprite,ledge){
+        let spriteRight=sprite.left+sprite.width,
+            ledgeRight=ledge.left+ledge.width,
+            spriteBottom=sprite.top+sprite.height,
+            nextSpriteBottomEstimate=spriteBottom+sprite.velocityY/fps;
+            //外接矩形 碰撞检测
+        return spriteRight>ledge.left&&
+                sprite.left<ledgeRight&&
+                spriteBottom<ledge.top&&
+                nextSpriteBottomEstimate>ledge.top;
+    },
+    execute:function(sprite,context,time){
+        if(isBallFalling()){
+            ledges.
+        }
+    }
+},
+
 moveBall={
     lastTime:undefined,
     resetBall:function(sprite){

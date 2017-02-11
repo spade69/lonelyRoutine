@@ -51,6 +51,9 @@ p.title {
     cursor:pointer;
     margin-left:10px;
     margin-top:10px;
-    background:url('/public/sky.png');
+    //background:url('/public/sky.png');
+    background:{
+      color:#87CEFA;
+    }
 }
 
