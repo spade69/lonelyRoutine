@@ -25,10 +25,23 @@ class Pause extends React.Component{
         this.handleClick=this.handleClick.bind(this);
     }
 
+    componentWillMount(){
+
+    }
+
     componentDidMount(){
-        console.log('DidMount');
-        window.onblur=MiniGame.windowOnBlur(this);
-        window.onfocus=MiniGame.windowOnFocus(this);
+        //window.onblur=MiniGame.windowOnBlur(this);
+        //window.onfocus=MiniGame.windowOnFocus(this);
+        console.log('work');
+        //document.addEventListener('blur', ()=>{MiniGame.windowOnBlur(this)} );
+        window.onblur=()=>{
+            //console.log(this);  if you don't use arrow function ,then this -> window
+            //now this -> Pause object -- a React Component
+            MiniGame.windowOnBlur(this);
+        }
+        window.onfocus=()=>{
+            MiniGame.windowOnFocus(this);
+        }
     }
 
     handleClick(){
@@ -36,8 +49,11 @@ class Pause extends React.Component{
     }
 
     render(){
+        const display=this.state.display;
         return(
-            <div className={s.toast+' '+s.toastOrigin} onClick={this.handleClick}>
+            <div className={s.toast+' '+s.toastOrigin} 
+                    onClick={this.handleClick}
+                    style={{display:display}}>
                 <p className={s.pause}>{this.props.pause.info}</p>
                 <p>{this.props.pause.start}</p>
             </div>

@@ -9,8 +9,10 @@
  */
 
 import Game from './lib/gameEngine.js';
+import Event from './lib/observer.js';
+import * as Arc from './components/arc.js';
 
-let game =new Game('miniGame','canvas'),
+var game =new Game('miniGame','canvas'),
     loading=false, // loading flag
 
     //Score
@@ -36,7 +38,10 @@ let game =new Game('miniGame','canvas'),
 
     //Scrolling the background........
     translateDelta=0.025,
-    translateOffset=0;
+    translateOffset=0,
+
+    // Lives......................................................
+    livesLeft = 1;
 
 let scrollBackground=function(){
         translateOffset=
@@ -141,7 +146,6 @@ let scrollBackground=function(){
         
     },
 
-    
     pauseToastClickHandler=function(e){
         //this --> the object in JSX
         this.setState({
@@ -152,13 +156,15 @@ let scrollBackground=function(){
 
 // 离开浏览器 失去焦点时触发
 function windowOnBlur(that){
+    console.log(loading,gameOver,game.paused);
     if(!loading && !gameOver&& !game.paused){
         togglePaused(that);
         let displayx=game.paused?'inline':'none';
-        that.setState({
+        that.setState({ 
             display:displayx
         });
     }
+    //console.log('sss');
 }
 
 function windowOnFocus(that){
@@ -169,6 +175,7 @@ function windowOnFocus(that){
             display:displayx
         });
     }
+    //console.log('eee');
 }
 
 //New Game..................................
@@ -183,7 +190,7 @@ let newGameClickHandler=function(e){
 function startNewGame(){
     //highScoreParagraph.style.display = 'none';
     gameOver=false;
-    //livesLeft
+    livesLeft=1;
     score=0;
 
 }
@@ -197,7 +204,7 @@ let showHighScores=function(that){
             highScoreDisplay:'inline'
         });
         //livesLeft
-        updateHighScoreList();
+        updateHighScoreList(that);
         that.setState({
             highScoreName:0 //0 focus 1 lost focus
         });
@@ -275,10 +282,22 @@ let showHighScores=function(that){
 
 //End game button
 let clearHighScoresCheckHandler=function(e){
-    if(this.state.clearAll){
-        game.clearHighScores();
+        if(this.state.clearAll){
+            game.clearHighScores();
+        }
+    },
+    //LoadScore handler
+    loadScoreDisplayHandler=function(){
+        let newStateObj={
+            scoreDisplay:'inline',
+            scoreText:'10'
+        };
+        loading=false;
+        score=10;
+        //console.log('loading Score');
+        game.playSound('pop');     
+        return newStateObj;
     }
-};
 
 
 //Load game ....................................................
@@ -286,14 +305,16 @@ loading=true;
 let loadButtonHandler=function(e){
     let interval,loadingPercentComplete=0;
     e.preventDefault();
+    //Inside handler  don't use this! 
     this.setState({
         loadButtonDisplay:'none',
         loadMsgDisplay:'block',
         progressDivDisplay:'block'
     });
     //progressDiv.appendChild(progressbar.domElement);
-    
-    //game.queueImage();
+    //No problem it's url of image , not physical path
+    game.queueImage('/public/waterfall.png');
+    game.queueImage('/public/tree.png');
     //Supposed to rewrite it with Promise!
     //Interval is the return value of setInterval 
     interval=setInterval((e)=>{
@@ -313,15 +334,11 @@ let loadButtonHandler=function(e){
                         this.setState({
                             loadingToastDisplay:'none'
                         })
-                        //game.playSound();
+                        game.playSound('pop');
                         setTimeout((e)=>{
-                            loading=false;
-                            score=10;
-                            this.setState({
-                                scoreDisplay:'inline',
-                                scoreText:'10'
-                            });
-                            //game.playSound();
+                            //Trigger the user-defined event. 
+                            Event.trigger('LoadScore');
+                            console.log('here');
                         },1000);
                     },500);
                 },500);
@@ -338,22 +355,33 @@ game.paintOverSprites=function(){
 };
 
 game.paintUnderSprites=function(){//Draw things other than sprites
-    if(!gameOver ){
-        over();
+    if(!gameOver&& livesLeft===0 ){///gameOver==false
+        ///over(that); //here call over 
+        ///事件 观察者模式， 订阅over事件，因为这个需要在
+        ///处理函数中调用 this.setState, 我选择了直接传入this来处理
+        ///这样就需要在App.jsx 中，利用arrow function来处理，但是其实
+        ///我不应该在业务逻辑直接this.setState来改变状态，而应该
+        ///把状态改变了之后返回给 React组件，在React组件里面通过事件
+        ///来获取这个改变后的state值，然后更新state。 其实也就是说
+        ///我的React里面的某个事件会触发这个state改变，但是改变是在
+        ///我业务逻辑中实现的 
+        Event.trigger('over');
     }else{
         paintSun(game.context);
         paintFarCloud(game.context,20,20);
         paintFarCloud(game.context,game.context.canvas.width+20,20);
 
         if(!gameOver){
-            updateScore(); 
+            //updateScore(that); 
+            Event.trigger('updateScore');
         }
     }
 };
 
 
 export {
-    over,togglePaused,pauseToastClickHandler,
+    over,updateScore,
+    togglePaused,pauseToastClickHandler,
     windowOnBlur,windowOnFocus,
     newGameClickHandler,
     addScoreClickHandler,
@@ -361,5 +389,7 @@ export {
     nameInputKeyUpHandler,
     clearHighScoresCheckHandler,
     loadButtonHandler,
+    loadScoreDisplayHandler,
+    startNewGame,
     game
 };

@@ -16,11 +16,11 @@
  *
  *  
  */
-let getTImeNow=function(){
+let getTimeNow=function(){
     return +new Date();
 }
 
-let Game=function(gameName,canvasId){
+function Game(gameName,canvasId){
     let canvas=document.getElementById(canvasId),
         self=this;
     this.context=canvas.getContext('2d');
@@ -34,7 +34,7 @@ let Game=function(gameName,canvasId){
     //Image loading
     //
     this.imgaeLoadingProgressCallback;
-    this.image={};
+    this.images={};
     this.imageUrls=[];
     this.imagesLoaded=0;
     this.imagesFailedToLoad=0;
@@ -69,8 +69,8 @@ let Game=function(gameName,canvasId){
     window.onkeydown=function(e){
         self.keyPressed(e);
     }
-    return this;
-};
+    //return this;
+}
 
 //Game method
 Game.prototype={
@@ -89,14 +89,14 @@ Game.prototype={
 
     //load a particular image
     loadImage:function(imageUrl){
-        let image=new Image(),self= this; 
+        let image=new Image();//self= this; 
         image.src=imageUrl;
 
-        image.addEventListener('load', function(e){
-            self.imageLoadedCallback(e);
+        image.addEventListener('load', (e)=>{
+            this.imageLoadedCallback(e);
         });
-        image.addEventListener('error',function(e){
-            self.imageLoadedErrorCallback(e);
+        image.addEventListener('error',(e)=>{
+            this.imageLoadedErrorCallback(e);
         });
 
         this.images[imageUrl]=image;
@@ -125,27 +125,28 @@ Game.prototype={
     //Start the animation by invoking window.requestNextAnimationFrame() 
     //We use JS built-in call()  function to call the function , with tje specified object game
     //setup game starting time
-    start:function(){
+    start:function(that){ //()
       //  let self=this;
         this.startTime=getTimeNow();//Record game's startTime
 
         window.requestNextAnimationFrame(
             (time)=>{
                 // animate is the frame presents to customers
-                this.animate.call(this,time); 
+                this.animate(time,that);//call(this,time); 
             });
 
     },
     //Drives the game animation. This method is called by the browser when it's time
     //for  the next animation frame
-    animate:function(time){
+    animate:function(time,that){
         //let self=this; 
         if(this.paused){
             //check if the game is still paused , in PAUSE_TIMEOUT. no need to check
             //more frequently
             setTimeout(()=>{
                 window.requestNextAnimationFrame((time)=>{
-                    this.animate.call(this,time);
+                    //this.animate.call(this,time);
+                    this.animate(time,that);
                 }) ; 
             },this.PAUSE_TIMEOUT);
         }else{  //game is not paused
@@ -153,7 +154,7 @@ Game.prototype={
             this.clearScreen(); //clear the screen
 
             this.startAnimate(time); //Override it
-            this.paintUnderSprites(); //Override
+            this.paintUnderSprites(that); //Override 
 
             this.updateSprites(time); //Invoke sprite behavirus
             this.paintSprites(time); //Paint sprites in the canvas
@@ -216,7 +217,7 @@ Game.prototype={
     //spent during the pause from the game's start time. 
     //Game pick up where it left off, without a potentially large jump in time.
     togglePaused:function()    {
-        let now=getTImeNow();
+        let now=getTimeNow();
         this.paused=!this.paused;
 
         if(this.paused){

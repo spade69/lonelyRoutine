@@ -1,3 +1,4 @@
+
 :root {
     /*
     * Typography
@@ -20,6 +21,8 @@
     --screen-md-min: 992px;  /* Medium screen / desktop */
     --screen-lg-min: 1200px; /* Large screen / wide desktop */
 }
+body{background:#dddddd;}
+
 
 div .title { 
    color: blue;
@@ -43,3 +46,11 @@ p.title {
    display: block;
    font: 12px Arial;
 }
+
+#canvas{
+    cursor:pointer;
+    margin-left:10px;
+    margin-top:10px;
+    background:url('/public/sky.png');
+}
+

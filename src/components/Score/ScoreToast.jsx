@@ -12,7 +12,7 @@ import './Score.scss';
 
 
 //only div
-const s={toast:'toast'};
+const s={toast:'toast',scoreToast:'scoreToast'};
 
 class ScoreToast extends React.Component{
     constructor(props){
@@ -21,8 +21,13 @@ class ScoreToast extends React.Component{
     }
 
     render(){
+        const scoreText=this.props.scoreText;
+        const scoreDisplay=this.props.scoreDisplay;
+        //let cssObj={display:scoreDisplay,:scoreText}
         return(
-            <div className={s.toast}>
+            <div className={s.toast+' '+s.scoreToast} 
+                    style={{display:scoreDisplay}}>
+            {scoreText}
             </div>
         );
     }

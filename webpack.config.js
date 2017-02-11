@@ -6,6 +6,8 @@ var commonsPlugin=new webpack.optimize.CommonsChunkPlugin({
     filename:"common.js",
     name:"commons"
 });
+//public path
+const ASSET_PATH=process.env.ASSET_PATH||'/public';
 
 module.exports={
     entry:{
@@ -48,9 +50,17 @@ module.exports={
                 query:{
                     presets:['react','env']
                 }
+            },
+            {
+                test:/\.(png|jpg)$/,
+                use:'url-loader?limit=40000'
             }
         ],
         
     },
-    plugins:[commonsPlugin]
+    plugins:[commonsPlugin,
+        new webpack.DefinePlugin({
+            'process.env.ASSET_PATH':JSON.stringify(ASSET_PATH)
+        })
+    ]
 } 

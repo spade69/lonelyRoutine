@@ -8,3 +8,12 @@
    position: absolute;
    display: none;
 }
+
+.scoreToast {
+   background: rgba(255,255,255,0.5);
+   left: 25px;
+   top: 25px;
+   padding: 5px; 
+   font-size: 1.25em;
+   color: rgba(0,0,250,1.0);
+}

@@ -30,6 +30,7 @@ class rankScore extends React.Component{
         this.state={
             value:'',
             rank:[],
+            preRank:[],
             preScoreDisplay:'none',
             //highScoreName:1  
             buttonDisable:true,
@@ -62,7 +63,7 @@ class rankScore extends React.Component{
             <div className={s.root}>
                 <p className={s.title}>{this.props.rank.title}</p>
                 <p>Input your name : </p>
-                <input type='text' autoFocus='true' onKeyup={this.handleNameKeyUp}/>
+                <input type='text' autoFocus='true' onKeyUp={this.handleNameKeyUp}/>
                 <input type='button' value={this.props.rank.add} 
                         disabled='true' onClick={this.handleAddClick} />
                 <input type='button' value={this.props.rank.new} 

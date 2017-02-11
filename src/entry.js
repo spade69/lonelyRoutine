@@ -21,6 +21,7 @@ import Stopwatch from './lib/stopWatch.js';
 import AnimationTimer from './lib/AnimationTimer';
 import * as polygonObj from './lib/polygon';
 import * as behaviors from './lib/behavior';
+import Event from './lib/observer.js';
 
 //Component
 /*import Audio from './components/Audio.jsx';
@@ -74,7 +75,7 @@ console.log(stopx.isRunning());*/
 
 //React //test data for App
 const items=['red','green','blue','orange','cornflowerblue'];
-const infos=[{url:'sd',type:'sdd'},{url:'sss',type:'qwe'}];
+const infos=[{url:'/public/sounds/pop.mp3',type:'mp3'},{url:'/public/sounds/whoosh.mp3',type:'mp3'}];
 const progress={title:'The Ungame',msg:'Loading...',value:'Loading Game...'};
 const rank={
     title:'High score!',
@@ -150,4 +151,11 @@ ReactDOM.render(
 
 
  //test 
- let animateTest=new AnimationTimer(2000,AnimationTimer.makeEaseOut(1));
+ //let animateTest=new AnimationTimer(2000,AnimationTimer.makeEaseOut(1));
+
+//Test Observer
+// Event.listen('ddd',(price)=>{
+//     console.log('price= '+price) ;
+// });
+
+// Event.trigger('ddd',20000);
