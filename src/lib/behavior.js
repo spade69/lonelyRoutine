@@ -21,7 +21,12 @@ let arrow=LEFT,
     easeInOut=AnimationTimer.makeEaseInOut(1),
     elastic=AnimationTimer.makeElastic(5),
     bounce=AnimationTimer.makeBounce(5);
-let animationTimer=new AnimationTimer(ANIMATION_DURATION,linear);
+       // AnimationTimers....................................................
+let animationTimer=new AnimationTimer(ANIMATION_DURATION,linear),
+    PUSH_ANIMATION_DURATION = 800,
+    pushAnimationTimer    = new AnimationTimer(PUSH_ANIMATION_DURATION),
+    fallingAnimationTimer = new AnimationTimer()
+;
 
 
 
@@ -75,7 +80,15 @@ fallOnLedge={
     },
     execute:function(sprite,context,time){
         if(isBallFalling()){
-            ledges.
+            ledges.forEach((ledge)=>{
+                if(fallOnLedge.ballWillHitLedge(ledge)){
+                    fallingAnimationTimer.stop();
+                    pushAnimationTimer.stop();
+
+                    sprite.top=ledge.top-sprite.height;
+                    sprite.velocityY=0;
+                }
+            });
         }
     }
 },
@@ -117,4 +130,9 @@ moveBall={
     }
 }
 
-export {runInPlace,moveRightToLeft,moveBall};
+
+function isBallFalling(){
+    return fallingAnimationTimer.isRunning();
+}
+
+export {runInPlace,moveRightToLeft,moveBall,fallOnLedge};

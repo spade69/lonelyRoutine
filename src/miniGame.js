@@ -190,7 +190,7 @@ let scrollBackground=function(){
         }
     },
 //Sprite 
-    ballSprite=new Sprite('ball',ballPainter,[Behavior.moveBall]),
+    ballSprite=new Sprite('ball',ballPainter,[Behavior.moveBall,Behavior.fallOnLedge]),
 
 //Game over
     over=function(that){
@@ -393,7 +393,8 @@ function initalColor(){
     }
 }
 //handle Game event
-function 
+function handleGame(){}
+
 
 setInterval(()=>{
     let color=generateRandom();
