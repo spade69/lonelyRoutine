@@ -69,6 +69,10 @@ Sprite.prototype={
     height: 10,
     velocityX: 0,
     velocityY: 0,
+    fps:60,
+    freeze:false,
+    tapTimes:0,
+    color:undefined,
    visible: true,
    animating: false,
    painter: undefined, // object with paint(sprite, context)

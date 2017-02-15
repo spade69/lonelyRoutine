@@ -5,27 +5,36 @@
  * Date 2017/2/5
  */
 import AnimationTimer from './animationTimer.js';
+import * as GB from '../common/global' ;
+import Event from './observer.js';
+const ANIMATION_DURATION=GB.ANIMATION_DURATION,
+    PUSH_ANIMATION_DURATION=GB.PUSH_ANIMATION_DURATION,
+    RIGHT=GB.RIGHT,
+    LEFT=GB.LEFT,
+    GRAVITY_FORCE=GB.GRAVITY_FORCE,
+    TAP_FORCE=GB.TAP_FORCE,
+    TAP_VELOCITY=GB.TAP_VELOCITY,
+    PLATFORM_HEIGHT_IN_METERS=GB.PLATFORM_HEIGHT_IN_METERS,
+    BALL_RADIUS=GB.BALL_RADIUS;
 
-const ANIMATION_DURATION=3900,
-    RIGHT = 1,
-    LEFT = 2,
-    BALL_RADIUS  = 25,
-    LEDGE_LEFT   = 62,
-    LEDGE_TOP    = 275,
-    LEDGE_WIDTH  = canvas.width-(LEDGE_LEFT*2),
-    LEDGE_HEIGHT = 12;
-let arrow=LEFT,
+let canvas=GB.canvas,
+    arrow=LEFT,
+    LEDGE_LEFT   = 280,
+    LEDGE_TOP    = 55,
+    LEDGE_WIDTH  = 50,
+    LEDGE_HEIGHT = 12,
     linear=AnimationTimer.makeLinear(1),
     easeIn=AnimationTimer.makeEaseIn(1),
     easeOut=AnimationTimer.makeEaseOut(1),
     easeInOut=AnimationTimer.makeEaseInOut(1),
     elastic=AnimationTimer.makeElastic(5),
-    bounce=AnimationTimer.makeBounce(5);
+    bounce=AnimationTimer.makeBounce(5),
        // AnimationTimers....................................................
-let animationTimer=new AnimationTimer(ANIMATION_DURATION,linear),
-    PUSH_ANIMATION_DURATION = 800,
+    animationTimer=new AnimationTimer(ANIMATION_DURATION,linear),
     pushAnimationTimer    = new AnimationTimer(PUSH_ANIMATION_DURATION),
     fallingAnimationTimer = new AnimationTimer()
+   // pixelsPerMeter=(canvas.height-LEDGE_TOP)/PLATFORM_HEIGHT_IN_METERS
+
 ;
 
 
@@ -67,10 +76,17 @@ moveRightToLeft={
 
 },
 fallOnLedge={
+    ledgeRect:[
+        {left:0,top:0,width:0,height:0,color:undefined},
+        {left:0,top:0,width:0,height:0,color:undefined},
+        {left:0,top:0,width:0,height:0,color:undefined},
+        {left:0,top:0,width:0,height:0,color:undefined}
+    ],
     ballWillHitLedge:function(sprite,ledge){
+        let fps=sprite.fps;
         let spriteRight=sprite.left+sprite.width,
             ledgeRight=ledge.left+ledge.width,
-            spriteBottom=sprite.top+sprite.height,
+            spriteBottom=sprite.top+sprite.height*2, //here is sprite.height*2!!! not so accureately!
             nextSpriteBottomEstimate=spriteBottom+sprite.velocityY/fps;
             //外接矩形 碰撞检测
         return spriteRight>ledge.left&&
@@ -80,59 +96,78 @@ fallOnLedge={
     },
     execute:function(sprite,context,time){
         if(isBallFalling()){
-            ledges.forEach((ledge)=>{
-                if(fallOnLedge.ballWillHitLedge(ledge)){
+            this.ledgeRect.forEach((ledge)=>{
+                //Use this object directly~
+                if(fallOnLedge.ballWillHitLedge(sprite,ledge)){
                     fallingAnimationTimer.stop();
-                    pushAnimationTimer.stop();
-
-                    sprite.top=ledge.top-sprite.height;
+                    sprite.top=ledge.top-2*sprite.height;
+                    //console.log('falling',ledge,sprite);
                     sprite.velocityY=0;
+                    sprite.tapTimes=0;
                 }
-            });
+            });                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
         }
     }
 },
 
-moveBall={
-    lastTime:undefined,
-    resetBall:function(sprite){
-        sprite.left=LEDGE_LEFT- BALL_RADIUS;
-        sprite.top=LEDGE_TOP-BALL_RADIUS*2;
-    },
+//业务逻辑也包含在这个里面了，如何竖直上抛和检测小球碰撞
+//检测
+moveGravity={
+    lastFrameTime:undefined,
     isBallOnLedge:function(sprite){
           return sprite.left + 2*BALL_RADIUS > LEDGE_LEFT &&
           sprite.left < LEDGE_LEFT + LEDGE_WIDTH;
     },
-    updateBallPosition:function(elapsed,sprite){
-        if(arrow===LEFT) sprite.left-=sprite.velocityX*(elapsed/1000);
-        else
-            sprite.left+=sprite.velocityX*(elapsed/1000);
-    },
     execute:function(sprite,context,time){
-        if(animationTimer.isRunning()){
-            let animationElapsed=animationTimer.getElapsedTime(),
-                elapsed;
-            if(this.lastTime!==undefined){
-                elapsed=animationElapsed-this.lastTime;
-                this.updateBallPosition(elapsed,sprite);
+        let now=+new Date(),fps=sprite.fps;
+        if(this.lastFrameTime==undefined){
+            this.lastFrameTime=now;
+            return;
+        }
 
-                if(isBallOnLedge(sprite)){
-                    if(animationTimer.isOver()){
-                        animationTimer.stop();
-                    }
-                }
-                else{
-                    animationTimer.stop();
-                    this.resetBall();
-                }
-            }//this.lastTime
-        }//
+        Event.listen('OneTap',()=>{
+            startFalling(sprite);
+            this.lastFrameTime=now;
+
+        });
+
+        if(isBallFalling()){
+            sprite.top+=sprite.velocityY/fps;///this.fps;
+            //falling equation
+            sprite.velocityY=(GRAVITY_FORCE)*
+                (fallingAnimationTimer.getElapsedTime()/1000) + TAP_VELOCITY;
+           // console.log(sprite.velocityY);
+            if(sprite.top>canvas.height){
+                stopFalling(sprite);
+            }
+        }
     }
-}
+};
 
 
 function isBallFalling(){
     return fallingAnimationTimer.isRunning();
 }
 
-export {runInPlace,moveRightToLeft,moveBall,fallOnLedge};
+//ballSprite behavior
+function startFalling(ballSprite){
+    fallingAnimationTimer.start();
+    //ballSprite.velocityX=0;
+    ballSprite.velocityY=0;
+
+}
+
+function stopFalling(sprite){
+    reset(sprite);
+}
+
+function reset(sprite){
+    fallingAnimationTimer.stop();
+    pushAnimationTimer.stop();
+    sprite.left=LEDGE_LEFT+LEDGE_WIDTH/2;
+    sprite.top=LEDGE_TOP;
+    sprite.velocityY=0;
+}
+
+
+export {runInPlace,moveRightToLeft,moveGravity,fallOnLedge};
