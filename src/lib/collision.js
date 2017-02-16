@@ -27,7 +27,7 @@ isBallInBucket=function(bucketCenter){
 },
 
 handleEdgeCollisions=function(){
-    l
+    
 }
 
 

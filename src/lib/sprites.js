@@ -72,7 +72,7 @@ Sprite.prototype={
     fps:60,
     freeze:false,
     tapTimes:0,
-    color:undefined,
+    color:[],
    visible: true,
    animating: false,
    painter: undefined, // object with paint(sprite, context)

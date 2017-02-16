@@ -36,18 +36,25 @@ var game =new Game('miniGame','canvas'),
     lastKeyListenerTime=0, //For throttling arrow keys
 
     //Scrolling the background........
-    translateDelta=2.5, // 1 0.025
+    translateDelta=3, // 1 0.025
     translateOffset=0,
 
     // Lives......................................................
     livesLeft = 1,
 
-    //random color , 5s change once?
+    //random color , 5s change once?(first thought)
     // It needs to be an array, store the color of bottom rect
     // Length depends of the RECT_NUM
     // And contains every 
     ranColor=[],
+    backColor=[],
+    //store all colors
     stageColor=[],
+    //color that you earn,also means the score!
+    myColor=[], //score?
+    realMyColor=[],
+
+    leftColor=[],
     //Canvas
     CANVAS_WIDTH=game.context.canvas.width,
     CANVAS_HEIGHT=game.context.canvas.height,
@@ -76,7 +83,7 @@ var game =new Game('miniGame','canvas'),
     BALL_STROKE_STYLE='LightGrey',
     BALL_FILL_STYLES='LightCoral'
     ;
-    let BALL_LAUNCH_TOP=CANVAS_HEIGHT-RECT_HEIGHT-2*BALL_HEIGHT;
+    let BALL_LAUNCH_TOP=CANVAS_HEIGHT-RECT_HEIGHT-4*BALL_HEIGHT;
 let context=game.context;
 //滚动实现： 先计算出绘制图层需要对坐标系进行平移的距离，然后保存
 //绘图环境对象的状态，平移坐标原点，并将每个图层之中的物体绘制出来，
@@ -90,21 +97,24 @@ let scrollBackground=function(){
         translateOffset=translateOffset<context.canvas.width?
                             (translateOffset+translateDelta):0;
        // console.log(translateOffset);
-       if(translateOffset===CANVAS_WIDTH){
-            changeColor();
-       }
+  
         context.translate(-translateOffset,0);
-
+        
 // Two image actually ! Use one to cover the gap of another 
 // 两张图片(两个图形)，一个去弥补另一个
         paintNearCloud(context,120,20);
         paintNearCloud(context,context.canvas.width+120,20);
 
         //Paint Bottom 
+        if(translateOffset===CANVAS_WIDTH){
+            changeColor();
+        }
         paintBottomRect(context,0);
+
         //It must be context.canvas.width ！if context.canvas.width-50
         //then it will be 50 gap! 
-        paintBottomRect(context,context.canvas.width);
+        paintBottomRectOff(context,context.canvas.width); //paintBottomRect
+
         context.restore();
     },
 
@@ -115,10 +125,26 @@ let scrollBackground=function(){
         //change too fast , 
         //let ranColor=generateRandom();
         //console.log('paintRect'); hundreds times~!
-
-        for( let i=0;i<RECT_NUM*2;i++){//RECT_NUM
+        let tmpRect=Behavior.fallOnLedge.ledgeRect;
+        for( let i=0;i<RECT_NUM;i++){//RECT_NUM*2
             let x=offset+RECT_WIDTH*i;
+            tmpRect[i].color=ranColor[i];
             Arc.drawRoundedRect(RECT_STROKE_STYLE,ranColor[i],
+                                            x,y,RECT_WIDTH,
+                                            RECT_HEIGHT,CORNER_RADIUS);
+        }
+
+    },    
+    paintBottomRectOff=function(context,offset){
+        let y=context.canvas.height-RECT_HEIGHT;//x
+        //change too fast , 
+        //let ranColor=generateRandom();
+        //console.log('paintRect'); hundreds times~!
+         let tmpRect=Behavior.fallOnLedge.ledgeRect;
+        for( let i=0;i<RECT_NUM;i++){//RECT_NUM*2
+            let x=offset+RECT_WIDTH*i;
+            tmpRect[i].color=backColor[i];
+            Arc.drawRoundedRect(RECT_STROKE_STYLE,backColor[i],
                                             x,y,RECT_WIDTH,
                                             RECT_HEIGHT,CORNER_RADIUS);
         }
@@ -276,7 +302,6 @@ function startNewGame(){
     gameOver=false;
     livesLeft=1;
     score=0;
-
 }
 
 //High Scores
@@ -385,44 +410,94 @@ let clearHighScoresCheckHandler=function(e){
 
 //Util  Function
 //需要异步改变这个颜色。
-function generateRandom(){
+function generateRandom(Arr){
     //实际上是对数组下标的随机生成。 
-    let colorIndex=Math.floor(Math.random()*FILL_STYLES.length);
-    return FILL_STYLES[colorIndex];
+    let colorIndex=Math.floor(Math.random()*Arr.length);
+    return Arr[colorIndex];
+}
+
+function randomColorMerge(Arr1,Arr2){
+    let newArr,tmpArr;
+    tmpArr=Arr1.concat(Arr1);
+    newArr=tmpArr.concat(Arr2);
+    return newArr;
 }
 
 function initalColor(){
-    let initial=generateRandom();
+    let initial=generateRandom(leftColor);
     //spriteColor.push(initial);
-    ballSprite.color=initial;
-    for(var i=0;i<RECT_NUM*2;i++){
+    if(ballSprite){
+        ballSprite.color.push(initial);
+    }
+    for(var i=0;i<RECT_NUM;i++){//RECT_NUM*2
         ranColor.push(initial);
+        backColor.push(initial);
+        stageColor.push(initial);
     }
 }
 
 //Juding/compare color
 function compareColor(){
+    ballSprite.color.forEach((item)=>{
 
+    });
 }
 
 function changeColor(){
-    let color=stageColor.shift();
-     //Event.listen('colorChange',()=>{
-    ranColor.shift();
-    ranColor.push(color);
+    //let color=stageColor.shift();
+    //let tmp=backColor.shift();
+    copyToRan();
+    //不要马上更新背景颜色，不然就会跟不上~
+    //因为前面，动画可能还在画draw这个矩形
+    setTimeout(()=>{
+        updateBackColor();
+    },50);
+}
+
+function updateBackColor(){
+    for(let i=0;i<RECT_NUM;i++){
+        let temp=stageColor.shift();
+        backColor[i]=temp;
+    }
+}
+
+function copyToRan(){
+    for(let i=0;i<RECT_NUM;i++){
+        ranColor[i]=backColor[i];
+    }
+}
+
+//Using push ,not assign,because it's empty 
+function deepCopyColor(){
+    for(let i=0;i<FILL_STYLES.length;i++){
+        leftColor.push(FILL_STYLES[i]);
+    }
 }
 
 function createStages(){
-    let i=0;
-    for(let len=ranColor.length;i<len;i++){
-        stageColor.push(ranColor[i]);
-    }
+    let i=0,initial;
+    initial=ranColor[0];
+    myColor.push(initial);
+    //Rule of color !! 
     while(i<TOTAL_RECT){ //totalColor 150
-        //if(i%10===0){
-            let color=generateRandom();
-            stageColor.push(color);
-        //}
-
+        let len=leftColor.length;
+        //len>1 not len>0
+        if(i%10===0&&i>10&&len>1){
+            let tmpColor=generateRandom(leftColor);
+            let index=leftColor.indexOf(tmpColor);
+            //delete this color
+            leftColor.splice(index,1);
+            myColor.push(tmpColor); //adding new color to myColor
+            //ballSprite.color.push(tmpColor);
+        }
+        //let newArr=randomColorMerge(myColor,leftColor);
+        let color;
+        if(i%3==0&&len>0)
+             color=generateRandom(leftColor) ;
+        else {
+             color=generateRandom(myColor)
+        }
+        stageColor.push(color);
         i++;
     }
 }
@@ -471,7 +546,13 @@ ballSprite.velocityX=10;
 ballSprite.velocityY=0;
 console.log(Behavior.fallOnLedge);
 game.addSprite(ballSprite);
-initalColor();
+
+deepCopyColor();  //copy from FILL_STYLES to leftColor
+initalColor();//initialize color
+createStages(); //create totalColor
+//console.log(stageColor);
+
+
 let loadButtonHandler=function(e){
     let interval,loadingPercentComplete=0;
     e.preventDefault();
