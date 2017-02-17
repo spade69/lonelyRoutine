@@ -13,7 +13,16 @@ import './Score.scss';
 
 //only div
 const s={toast:'toast',scoreToast:'scoreToast'};
-
+let styleObj={
+    width:'30px',
+    height:'30px',
+    padding:'15px',
+    borderRadius:'120px',
+    borderLeft:'1px solid black',
+    background:'red',
+    position:'absolute',
+    left:'300px'
+};
 class ScoreToast extends React.Component{
     constructor(props){
         super(props);
@@ -28,7 +37,9 @@ class ScoreToast extends React.Component{
             <div className={s.toast+' '+s.scoreToast} 
                     style={{display:scoreDisplay}}>
             {scoreText}
+            <div style={styleObj}></div>
             </div>
+            
         );
     }
 }

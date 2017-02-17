@@ -119,7 +119,7 @@ fallOnLedge={
         }else {
             this.ledgeRect.forEach((ledge)=>{
                 if(fallOnLedge.isOnLedge(sprite,ledge)){
-                    if(!compareColor(sprite,ledge)){
+                    if(!compareColor(sprite,ledge)&&ledge.color!=undefined){
                         //sprite.velocityY=300;
                         console.log('trap');
                         trapFalling(sprite);
@@ -191,6 +191,8 @@ function trapFalling(sprite){
     //fallingAnimationTimer.start();
     sprite.velocityY=300;
     moveGravity.trap=true;
+    Event.trigger('EndGame');//trigger event!
+    console.log('endgame');
 }
 
 function stopFalling(sprite){
@@ -210,8 +212,8 @@ function compareColor(sprite,ledge){
     let arrColors=sprite.color,flag=false;
     //console.log(arrColors);
     arrColors.forEach((item)=>{
-       // console.log(item,ledge.color);
-        if(item===ledge.color)//contains color of ledge.color
+        //console.log(item,ledge.color);
+        if(item===ledge.color&&ledge.color!=undefined)//contains color of ledge.color
             flag=true;
     });
 

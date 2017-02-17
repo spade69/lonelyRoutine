@@ -30,7 +30,7 @@ var game =new Game('miniGame','canvas'),
     
     //Over
     gameOver=false,
-
+    gameStart=false,
 
     //Key Listeners
     lastKeyListenerTime=0, //For throttling arrow keys
@@ -51,10 +51,11 @@ var game =new Game('miniGame','canvas'),
     //store all colors
     stageColor=[],
     //color that you earn,also means the score!
-    myColor=[], //score?
+    //myColor=[], //score?
     realMyColor=[],
 
     leftColor=[],
+    currentLedgeColor=[],
     //Canvas
     CANVAS_WIDTH=game.context.canvas.width,
     CANVAS_HEIGHT=game.context.canvas.height,
@@ -83,7 +84,7 @@ var game =new Game('miniGame','canvas'),
     BALL_STROKE_STYLE='LightGrey',
     BALL_FILL_STYLES='LightCoral'
     ;
-    let BALL_LAUNCH_TOP=CANVAS_HEIGHT-RECT_HEIGHT-4*BALL_HEIGHT;
+    let BALL_LAUNCH_TOP=CANVAS_HEIGHT-RECT_HEIGHT-2*BALL_HEIGHT;
 let context=game.context;
 //滚动实现： 先计算出绘制图层需要对坐标系进行平移的距离，然后保存
 //绘图环境对象的状态，平移坐标原点，并将每个图层之中的物体绘制出来，
@@ -106,7 +107,12 @@ let scrollBackground=function(){
         paintNearCloud(context,context.canvas.width+120,20);
 
         //Paint Bottom 
-        if(translateOffset===CANVAS_WIDTH){
+ 
+        //update the current Color array which relects the ledgeColor
+        updateCurrentColor(translateOffset);
+        updateLedgeColor();
+        //console.log(currentLedgeColor);
+        if(translateOffset===CANVAS_WIDTH&&gameStart){
             changeColor();
         }
         paintBottomRect(context,0);
@@ -114,7 +120,6 @@ let scrollBackground=function(){
         //It must be context.canvas.width ！if context.canvas.width-50
         //then it will be 50 gap! 
         paintBottomRectOff(context,context.canvas.width); //paintBottomRect
-
         context.restore();
     },
 
@@ -125,10 +130,8 @@ let scrollBackground=function(){
         //change too fast , 
         //let ranColor=generateRandom();
         //console.log('paintRect'); hundreds times~!
-        let tmpRect=Behavior.fallOnLedge.ledgeRect;
         for( let i=0;i<RECT_NUM;i++){//RECT_NUM*2
             let x=offset+RECT_WIDTH*i;
-            tmpRect[i].color=ranColor[i];
             Arc.drawRoundedRect(RECT_STROKE_STYLE,ranColor[i],
                                             x,y,RECT_WIDTH,
                                             RECT_HEIGHT,CORNER_RADIUS);
@@ -140,10 +143,9 @@ let scrollBackground=function(){
         //change too fast , 
         //let ranColor=generateRandom();
         //console.log('paintRect'); hundreds times~!
-         let tmpRect=Behavior.fallOnLedge.ledgeRect;
+        // let tmpRect=Behavior.fallOnLedge.ledgeRect;
         for( let i=0;i<RECT_NUM;i++){//RECT_NUM*2
             let x=offset+RECT_WIDTH*i;
-            tmpRect[i].color=backColor[i];
             Arc.drawRoundedRect(RECT_STROKE_STYLE,backColor[i],
                                             x,y,RECT_WIDTH,
                                             RECT_HEIGHT,CORNER_RADIUS);
@@ -226,21 +228,22 @@ let scrollBackground=function(){
 
 //Game over
     over=function(that){
-        let highScore,
+        let highScore,overDisplay,
             highScores=game.getHighScores();
-        if(highScores.length===0||score>highScores[0].score){
-            showHighScores(that); //App 
-        }
-        else{
+        // if(highScores.length===0&&score>highScores[0].score){//||
+        //     showHighScores(that); //App 
+        // }
+        // else{
             //gameOverToast.style.display = 'inline';
-            that.setState({
-                overDisplay:'inline' //change it to the top level
-            });
-        }
+
+            overDisplay='inline'; //change it to the top level
+
+        // }
 
         gameOver=true;
         lastScore=score;
         score=0;
+        return overDisplay;
     },
 
 
@@ -291,10 +294,9 @@ function windowOnFocus(that){
 //New Game..................................
 //Actually this belongs to the over Compoent
 let newGameClickHandler=function(e){
-        this.setState({
-            overDisplay:'none'
-        });
+
         startNewGame();
+        return 'none';
     };
 
 function startNewGame(){
@@ -302,6 +304,9 @@ function startNewGame(){
     gameOver=false;
     livesLeft=1;
     score=0;
+    ballSprite.left=BALL_LAUNCH_LEFT;
+    ballSprite.top=BALL_LAUNCH_TOP;
+    ballSprite.velocityY=0;
 }
 
 //High Scores
@@ -432,16 +437,17 @@ function initalColor(){
     for(var i=0;i<RECT_NUM;i++){//RECT_NUM*2
         ranColor.push(initial);
         backColor.push(initial);
+        currentLedgeColor.push(initial);
         stageColor.push(initial);
     }
 }
 
-//Juding/compare color
-function compareColor(){
-    ballSprite.color.forEach((item)=>{
+// //Juding/compare color
+// function compareColor(){
+//     ballSprite.color.forEach((item)=>{
 
-    });
-}
+//     });
+// }
 
 function changeColor(){
     //let color=stageColor.shift();
@@ -475,7 +481,7 @@ function deepCopyColor(){
 }
 
 function createStages(){
-    let i=0,initial;
+    let i=0,initial,myColor=[];
     initial=ranColor[0];
     myColor.push(initial);
     //Rule of color !! 
@@ -512,6 +518,44 @@ function handleGameClick(){
     }
 }
 
+function updateCurrentColor(translateOffset){
+    switch(translateOffset){
+        case 0: 
+            for(let i=0;i<RECT_NUM;i++){
+                currentLedgeColor[i]=ranColor[i];
+            }
+        break;
+        case RECT_WIDTH:
+            currentLedgeColor.shift();
+            currentLedgeColor.push(backColor[0]);break;
+        case RECT_WIDTH*2:
+            currentLedgeColor.shift();
+            currentLedgeColor.push(backColor[1]);break;
+        case RECT_WIDTH*3:
+            currentLedgeColor.shift();
+            currentLedgeColor.push(backColor[2]);     
+            break;
+        case CANVAS_WIDTH:
+            currentLedgeColor.shift();
+            currentLedgeColor.push(backColor[3]);break;
+        default:break;
+    }
+}
+
+function updateLedgeColor(){
+    let tmpRect=Behavior.fallOnLedge.ledgeRect;
+    for(let i=0;i<RECT_NUM;i++){
+        tmpRect[i].color=currentLedgeColor[i];
+    }
+}
+
+
+function endGame(){
+        livesLeft--;
+        gameOver=true;
+        score=0;
+        Event.trigger('over');
+}
 
 context.canvas.onclick=handleGameClick;
 
@@ -552,6 +596,8 @@ initalColor();//initialize color
 createStages(); //create totalColor
 //console.log(stageColor);
 
+//hadnler of Endgame
+Event.listen('EndGame',endGame);
 
 let loadButtonHandler=function(e){
     let interval,loadingPercentComplete=0;
@@ -589,7 +635,8 @@ let loadButtonHandler=function(e){
                         setTimeout((e)=>{
                             //Trigger the user-defined event. 
                             Event.trigger('LoadScore');
-                            console.log('here');
+                            gameStart=true;
+                            //console.log('here');
                         },1000);
                     },500);
                 },500);
@@ -605,14 +652,14 @@ game.startAnimate=function(){
     //console.log(ballSprite.color);
 };
 //called after thr sprites are painted
-game.paintOverSprites=function(){
+game.paintOverSprites=function(translateOffset){
     scrollBackground();
 };
 
 //Called before the sprite is painted 
 game.paintUnderSprites=function(){//Draw things other than sprites
     if(!gameOver&& livesLeft===0 ){///gameOver==false
-        over(that); //here call over 
+        //over(that); //here call over 
         ///事件 观察者模式， 订阅over事件，因为这个需要在
         ///处理函数中调用 this.setState, 我选择了直接传入this来处理
         ///这样就需要在App.jsx 中，利用arrow function来处理，但是其实

@@ -14,6 +14,8 @@ const s={
     root:'Progress-root',
     title:'Progress-title',
     button:'Progress-button',
+    input:'Progress-input',
+    arrow:'Progress-button:after',
     progress:'Progress-Div',
     msg:'Progress-Msg'
 };//should replace as .css
@@ -33,11 +35,11 @@ class LoadButton extends React.Component{
         const MsgDisplay=this.props.loadMsgDisplay; //don't use this.props
         const display=this.props.display;
         return(
-            <span className={s.button}>
+            <span className={s.button+' '+s.arrow}>
                 <input type='button' value={this.props.progress.value} 
-                                            autoFocus='true'
                                             style={{display:display}}
-                                            onClick={this.props.onClick} />
+                                            onClick={this.props.onClick}
+                                            className={s.input} />
                 <span className={s.msg} style={{display:MsgDisplay}}>{this.props.progress.msg}</span>
             </span>
         );

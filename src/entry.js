@@ -76,7 +76,8 @@ console.log(stopx.isRunning());*/
 //React //test data for App
 const items=['red','green','blue','orange','cornflowerblue'];
 const infos=[{url:'/public/sounds/pop.mp3',type:'mp3'},{url:'/public/sounds/whoosh.mp3',type:'mp3'}];
-const progress={title:'The Ungame',msg:'Loading...',value:'Loading Game...'};
+const progress={title:'',msg:'Loading...',value:'Loading Game...'};
+//title:'The Ungame'
 const rank={
     title:'High score!',
     add:'Add score',

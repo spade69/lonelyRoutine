@@ -46,7 +46,10 @@ class App extends React.Component{
     }
 
     newGameClickHandler(){
-        MiniGame.newGameClickHandler();
+        let overDisplay= MiniGame.newGameClickHandler();
+        this.setState({
+            overDisplay:overDisplay
+        });
     }
 
     componentDidMount(){
@@ -54,7 +57,15 @@ class App extends React.Component{
         MiniGame.game.start(this);
         MiniGame.startNewGame(); 
         //Event.listen('LoadScore',MiniGame.loadScoreDisplayHandler)
-        Event.listen('over',()=>{MiniGame.over(this);});
+        Event.listen('over',()=>{
+            let overDisplay=MiniGame.over(this);
+            console.log(overDisplay);
+            if(overDisplay){
+                this.setState({
+                    overDisplay:overDisplay
+                });
+            }
+        });
         Event.listen('updateScore',()=>{MiniGame.updateScore(this);});
     }   
 

@@ -1,17 +1,12 @@
+$CANVAS_WIDTH:600px;
+
 .Progress-root {
-   padding: 20px;
-   position: absolute;
-   left: 50px;
-   top: 180px;
-   width: 450px;
-   height: 400px;
-   display: block;
+   position:relative;
+   width:$CANVAS_WIDTH;
+   
 }
 
 .Progress-title {
-   padding:{ 
-      left:177px;
-   };
    font: 16px Arial;
 }
 
@@ -22,20 +17,65 @@
 }
 
 .Progress-button {
+   padding:{
+      top: 50%;
+   }
+   margin:{
+      top:50%;
+   } 
+   padding: 20px;
    position: absolute;
-   left: 200px;
-   padding-top: 20px;
+   left:40%;
+   top: $CANVAS_WIDTH/2;
+   width: 100px;
+   height: 80px;
+   display: block;
+   background:{
+      color:white;
+   }
+   margin:0 auto;
+   border-radius:20px;
+   box-shadow:1px 1px 5px #999;
+
 }
+.Progress-input{
+   position:absolute;
+   width:0;
+   height:0;
+   //20% depends on the parent node 's width
+   margin:{
+      left:20%;
+      top:20%;
+   }
+   border:25px solid transparent;
+   border-left:50px solid #00CC00;
+   background-color:transparent;
+   content:'  ';
+}
+// .Progress-button:after{
+//       //arrow
+//    position:absolute;
+//    width:0;
+//    height:0;
+//    //20% depends on the parent node 's width
+//    margin-left:20%;
+//    border:20px solid transparent;
+//    border-left:40px solid #00CC00;
+//    content:'  ';
+// }
 
 .Progress-Div {
-   padding-left: 60px;
-   padding-top: 45px;
+   padding:{
+      left:60px;
+      top:45px;
+   }
 }
 
 .Progress-Msg {
    display: none;
-   font: 13px Helvetica;
+   font: 15px Helvetica;
    padding-left: 20px;
+   color:blue;
 } 
 
 .blurb {
