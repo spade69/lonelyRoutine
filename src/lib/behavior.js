@@ -77,12 +77,13 @@ moveRightToLeft={
 },
 //intialize first ,then new Sprite adding behavior to it.
 fallOnLedge={
+    //top width height will not change ,these are fixed 
     ledgeRect:[
         {left:0,top:0,width:0,height:0,color:undefined},
         {left:0,top:0,width:0,height:0,color:undefined},
         {left:0,top:0,width:0,height:0,color:undefined},
         {left:0,top:0,width:0,height:0,color:undefined}
-    ],
+    ], 
     ballWillHitLedge:function(sprite,ledge){
         let fps=sprite.fps;
         let spriteRight=sprite.left+sprite.width,
@@ -90,6 +91,9 @@ fallOnLedge={
             spriteBottom=sprite.top+sprite.height*2, //here is sprite.height*2!!! not so accureately!
             nextSpriteBottomEstimate=spriteBottom+sprite.velocityY/fps;
             //外接矩形 碰撞检测
+            //此处的碰撞检测包含了3种情况，sprite在ledge的左边缘上，但还没超出
+            //sprite在ledge的右边缘上，但还没超出，
+            //sprite整体在ledge里面。 后面的identify会判断出来
         return spriteRight>ledge.left&&
                 sprite.left<ledgeRight&&
                 spriteBottom<ledge.top&&
@@ -101,31 +105,39 @@ fallOnLedge={
     },
     execute:function(sprite,context,time){
         if(isBallFalling()){
-            this.ledgeRect.forEach((ledge)=>{
+            let ledgeArr=this.ledgeRect;
+            for(let len=this.ledgeRect.length,i=0;i<len;i++){
                 //Use this object directly~
                 //if Hit happens!
-                if(fallOnLedge.ballWillHitLedge(sprite,ledge)){
-                    //console.log(compareColor(sprite,ledge));
-                    if(compareColor(sprite,ledge)){
+                if(fallOnLedge.ballWillHitLedge(sprite,ledgeArr[i])){
+                    //console.log(i);
+                    //detectRange decides the true, real index of this hitLedge！
+                    //决定了真正要比较的ledge的下标！
+                    let index=detectRange(sprite,ledgeArr[i],ledgeArr);
+                    console.log(index);
+                    if(compareColor(sprite,ledgeArr[index])){
                         fallingAnimationTimer.stop();
-                        sprite.top=ledge.top-2*sprite.height;
+                        sprite.top=ledgeArr[i].top-2*sprite.height;
                         //console.log('falling',ledge,sprite);
                         //console.log('hit and color equals');
                         sprite.velocityY=0;
                         sprite.tapTimes=0;
-                    } //else {}
-                }
-            });                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
-        }else {
-            this.ledgeRect.forEach((ledge)=>{
-                if(fallOnLedge.isOnLedge(sprite,ledge)){
-                    if(!compareColor(sprite,ledge)&&ledge.color!=undefined){
-                        //sprite.velocityY=300;
-                        console.log('trap');
+                    } else {
                         trapFalling(sprite);
                     }
                 }
-            });
+            }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+        }else {
+            let ledgeArr=this.ledgeRect;
+            for(let len=this.ledgeRect.length,i=0;i<len;i++){
+                if(fallOnLedge.isOnLedge(sprite,ledgeArr[i])){
+                    if(!compareColor(sprite,ledgeArr[i])&&ledgeArr[i].color!=undefined){
+                        //sprite.velocityY=300;
+                        //console.log('trap');
+                        trapFalling(sprite);
+                    }
+                }
+            }
     
         }
     }
@@ -189,10 +201,10 @@ function startFalling(ballSprite){
 
 function trapFalling(sprite){
     //fallingAnimationTimer.start();
-    sprite.velocityY=300;
+    sprite.velocityY=700;
     moveGravity.trap=true;
     Event.trigger('EndGame');//trigger event!
-    console.log('endgame');
+    //console.log('endgame');
 }
 
 function stopFalling(sprite){
@@ -211,12 +223,63 @@ function reset(sprite){
 function compareColor(sprite,ledge){
     let arrColors=sprite.color,flag=false;
     //console.log(arrColors);
-    arrColors.forEach((item)=>{
-        //console.log(item,ledge.color);
-        if(item===ledge.color&&ledge.color!=undefined)//contains color of ledge.color
+
+    for(let i=0,len=arrColors.length;i<len;i++){
+        //console.log(arrColors[i],ledge.color);
+        if(arrColors[i]===ledge.color&&ledge.color!=undefined)//contains color of ledge.color
+        { 
             flag=true;
-    });
+            return flag;
+        }
+    }
 
     return flag;
 }
+
+function detectRange(sprite,ledge,ledgeArr){
+    //ledge: current ledge, ledgeArr contains all the ledges 
+    //we need to compare current ledge and next ledge
+    //Normally ballHitLedge only happens on the second or third   rect
+    //I've tested ,always return index===1. 
+    //We don't know the hitLedge is on the left side of the sprite or
+    //the right side. so we need to identify. 
+    let index=ledgeArr.indexOf(ledge),
+        ledgeRight=ledge.left+ledge.width,
+        spriteRight=sprite.left+sprite.width,
+        leftWidth,
+        rightWidth;
+    let flag=identify(sprite,ledge);
+    //supposed index===1
+    if(flag===0){
+        return index;
+    }
+    //flag===1 means on the right side , -1 means on the left side 
+    leftWidth=(flag===1)?(ledge.width-(sprite.left-ledge.left)):
+                                    (ledge.left-sprite.left);
+    rightWidth=(flag===1)?(spriteRight-ledgeRight):
+                                (ledge.width-(ledgeRight-spriteRight));
+    
+    if(flag===1){
+        //Math.max(leftWidth,rightWidth);//return the larger number
+        return (leftWidth>rightWidth)?(index-1):(index);
+    }else{
+        return (leftWidth>rightWidth)?(index):(index+1);
+    }
+}
+
+function identify(sprite,ledge){
+    let ledgeRight=ledge.left+ledge.width,
+        spriteRight=sprite.left+sprite.width;
+    if(ledge.left<=sprite.left&&ledgeRight>=spriteRight){
+        //completely inside the ledge!
+        return 0;
+    }else if(ledgeRight>spriteRight&&ledge.left>sprite.left){
+        //over the range of left side ,超出左边边缘了。但仍然算碰撞到
+        return -1;
+    }else{
+        //超出右边边缘了，但仍然是属于碰撞
+        return 1;
+    }
+}
+
 export {runInPlace,moveRightToLeft,moveGravity,fallOnLedge};

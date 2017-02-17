@@ -48,14 +48,17 @@ var game =new Game('miniGame','canvas'),
     // And contains every 
     ranColor=[],
     backColor=[],
+    currentLedgeColor=[],
     //store all colors
     stageColor=[],
     //color that you earn,also means the score!
-    //myColor=[], //score?
-    realMyColor=[],
+    myColor=[], //score?
+    realMyObj=[],//realMyColor=[],
+    countRect=0,
 
     leftColor=[],
-    currentLedgeColor=[],
+
+
     //Canvas
     CANVAS_WIDTH=game.context.canvas.width,
     CANVAS_HEIGHT=game.context.canvas.height,
@@ -105,21 +108,31 @@ let scrollBackground=function(){
 // 两张图片(两个图形)，一个去弥补另一个
         paintNearCloud(context,120,20);
         paintNearCloud(context,context.canvas.width+120,20);
-
-        //Paint Bottom 
- 
-        //update the current Color array which relects the ledgeColor
-        updateCurrentColor(translateOffset);
-        updateLedgeColor();
         //console.log(currentLedgeColor);
+        //这两个判断需要gameStart为true的时候才对！
         if(translateOffset===CANVAS_WIDTH&&gameStart){
             changeColor();
         }
+         //update the current Color array which relects the ledgeColor
+        updateCurrentColor(translateOffset);
+        //Count 
+        if(translateOffset%RECT_WIDTH===0&&translateOffset>=RECT_WIDTH&&gameStart){
+            countRect++;   
+            //console.log(countRect);
+            updateMyRealColor();
+            //every RECT_WIDTH we update the rect 's left
+            //resetLeft();
+        }
+
+         //Paint Bottom 
         paintBottomRect(context,0);
 
         //It must be context.canvas.width ！if context.canvas.width-50
         //then it will be 50 gap! 
         paintBottomRectOff(context,context.canvas.width); //paintBottomRect
+
+        updateLedgeColor();
+        updateLedgeLeft();
         context.restore();
     },
 
@@ -307,6 +320,9 @@ function startNewGame(){
     ballSprite.left=BALL_LAUNCH_LEFT;
     ballSprite.top=BALL_LAUNCH_TOP;
     ballSprite.velocityY=0;
+    // deepCopyColor();  //copy from FILL_STYLES to leftColor
+    // initalColor();//initialize color
+    // createStages(); //create totalColor
 }
 
 //High Scores
@@ -404,7 +420,7 @@ let clearHighScoresCheckHandler=function(e){
     loadScoreDisplayHandler=function(){
         let newStateObj={
             scoreDisplay:'inline',
-            scoreText:'10'
+            scoreText:'0'
         };
         loading=false;
         score=10;
@@ -440,6 +456,7 @@ function initalColor(){
         currentLedgeColor.push(initial);
         stageColor.push(initial);
     }
+    //realMyObj.push({color:initial,left:300});
 }
 
 // //Juding/compare color
@@ -481,7 +498,7 @@ function deepCopyColor(){
 }
 
 function createStages(){
-    let i=0,initial,myColor=[];
+    let i=0,initial;
     initial=ranColor[0];
     myColor.push(initial);
     //Rule of color !! 
@@ -517,8 +534,9 @@ function handleGameClick(){
         ballSprite.tapTimes++;
     }
 }
-
+//lookup table 
 function updateCurrentColor(translateOffset){
+    let a=100;
     switch(translateOffset){
         case 0: 
             for(let i=0;i<RECT_NUM;i++){
@@ -543,18 +561,70 @@ function updateCurrentColor(translateOffset){
 }
 
 function updateLedgeColor(){
+    //updating here 
     let tmpRect=Behavior.fallOnLedge.ledgeRect;
     for(let i=0;i<RECT_NUM;i++){
         tmpRect[i].color=currentLedgeColor[i];
     }
 }
 
+function updateLedgeLeft(translateDelta){
+    let tmpRect=Behavior.fallOnLedge.ledgeRect;
+    for(let i=0;i<RECT_NUM;i++){
+        tmpRect[i].left-=translateDelta;
+    }
+}
+
+function resetLeft(){
+    let tmpRect=Behavior.fallOnLedge.ledgeRect;
+    for(let i=0;i<RECT_NUM;i++){
+        tmpRect[i].left=i*RECT_WIDTH;
+    }
+}
 
 function endGame(){
         livesLeft--;
         gameOver=true;
         score=0;
+        countRect=0;
         Event.trigger('over');
+}
+
+function emptyArr(){
+    realMyObj=[];
+    stageColor=[];
+    leftColor=[];
+    myColor=[];
+}
+
+function updateMyRealColor(){ //countRect realMyColor myColor
+    let leftOffset=calculLeftOffset();
+    if(countRect%10===0&&countRect>=10){
+        let color=myColor.shift();
+        if(color){ //if color==undefined, then escape it 
+            let tmpObj={color:color,left:leftOffset};
+            realMyObj.push(tmpObj);
+        }
+        //realMyColor.push(color);//adding new color 
+    }
+    if(realMyObj.length<12){//if length >11
+        Event.trigger('updateLineBallObj',realMyObj);
+    }
+}
+
+function calculLeftOffset(){
+    //len is changing all the time. leftOffset is a local variable
+    let len=realMyObj.length,leftOffset;
+    if(len===1){
+        leftOffset=250;
+        return leftOffset;
+    }
+    if(len<7){ //already draw 1?
+        leftOffset=250-(len-1)*45;
+    }else {
+        leftOffset=250+(len-6)*45;
+    }
+    return leftOffset;
 }
 
 context.canvas.onclick=handleGameClick;
@@ -572,13 +642,11 @@ loading=true;
 //Initalize 
 let temp=Behavior.fallOnLedge.ledgeRect[0],temp2=Behavior.fallOnLedge.ledgeRect[1],
     temp3=Behavior.fallOnLedge.ledgeRect[2],temp4=Behavior.fallOnLedge.ledgeRect[3];
-temp.left=0;
+
 temp.top=temp2.top=temp3.top=temp4.top=game.context.canvas.height-RECT_HEIGHT;
 temp.width=temp2.width=temp3.width=temp4.width=RECT_WIDTH;
 temp.height=temp2.height=temp3.height=temp4.height=RECT_HEIGHT;
-temp2.left=RECT_WIDTH;
-temp3.left=RECT_WIDTH*2;
-temp4.left=RECT_WIDTH*3;
+resetLeft();
 
 let ballSprite=new Sprite('ball',ballPainter,[Behavior.moveGravity,Behavior.fallOnLedge]);
 //INITALIZE
@@ -593,7 +661,7 @@ game.addSprite(ballSprite);
 
 deepCopyColor();  //copy from FILL_STYLES to leftColor
 initalColor();//initialize color
-createStages(); //create totalColor
+createStages(); //create totalColor stageColor
 //console.log(stageColor);
 
 //hadnler of Endgame
@@ -637,10 +705,10 @@ let loadButtonHandler=function(e){
                             Event.trigger('LoadScore');
                             gameStart=true;
                             //console.log('here');
-                        },1000);
-                    },500);
-                },500);
-            },500);
+                        },500);
+                    },100);
+                },100);
+            },100);
         }
          //progressbar.draw(loadingPercentComplete);
     },16)
@@ -654,6 +722,7 @@ game.startAnimate=function(){
 //called after thr sprites are painted
 game.paintOverSprites=function(translateOffset){
     scrollBackground();
+   // updateMyRealColor();
 };
 
 //Called before the sprite is painted 

@@ -59,7 +59,7 @@ class App extends React.Component{
         //Event.listen('LoadScore',MiniGame.loadScoreDisplayHandler)
         Event.listen('over',()=>{
             let overDisplay=MiniGame.over(this);
-            console.log(overDisplay);
+           // console.log(overDisplay);
             if(overDisplay){
                 this.setState({
                     overDisplay:overDisplay
@@ -70,7 +70,8 @@ class App extends React.Component{
     }   
 
     componentDidUpdate(prevProps,prevState){
-
+        //when setState was called at some place, this
+        //method will be execute
     }
 
     render(){
