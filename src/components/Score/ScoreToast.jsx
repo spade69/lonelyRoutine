@@ -70,11 +70,16 @@ class ScoreToast extends React.Component{
 
     componentDidMount(){
         //suitable to set listen
-        Event.listen('updateLineBallObj',(readMyObj)=>{
+        Event.listen('updateLineBallObj',(realMyObj)=>{
             this.setState({
-                arrObj:readMyObj
+                arrObj:realMyObj
             });
+            //console.log(realMyObj);
         });
+    }
+
+    componentDidUpdate(){
+
     }
 
     render(){

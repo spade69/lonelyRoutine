@@ -56,6 +56,7 @@ class Pause extends React.Component{
                     style={{display:display}}>
                 <p className={s.pause}>{this.props.pause.info}</p>
                 <p>{this.props.pause.start}</p>
+                <span></span>
             </div>
         );
     }

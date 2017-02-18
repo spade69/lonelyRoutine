@@ -70,6 +70,7 @@ Sprite.prototype={
     velocityX: 0,
     velocityY: 0,
     fps:60,
+    trap:false,
     freeze:false,
     tapTimes:0,
     color:[],

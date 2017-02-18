@@ -46,7 +46,8 @@ class App extends React.Component{
     }
 
     newGameClickHandler(){
-        let overDisplay= MiniGame.newGameClickHandler();
+        let overDisplay= MiniGame.newGameClick();
+        console.log(overDisplay);
         this.setState({
             overDisplay:overDisplay
         });
@@ -59,8 +60,8 @@ class App extends React.Component{
         //Event.listen('LoadScore',MiniGame.loadScoreDisplayHandler)
         Event.listen('over',()=>{
             let overDisplay=MiniGame.over(this);
-           // console.log(overDisplay);
-            if(overDisplay){
+            //console.log('trigger over here!');
+            if(overDisplay==='inline'){
                 this.setState({
                     overDisplay:overDisplay
                 });

@@ -32,9 +32,10 @@ let canvas=GB.canvas,
        // AnimationTimers....................................................
     animationTimer=new AnimationTimer(ANIMATION_DURATION,linear),
     pushAnimationTimer    = new AnimationTimer(PUSH_ANIMATION_DURATION),
-    fallingAnimationTimer = new AnimationTimer()
+    fallingAnimationTimer = new AnimationTimer(),
    // pixelsPerMeter=(canvas.height-LEDGE_TOP)/PLATFORM_HEIGHT_IN_METERS
-
+   tap=false,
+   Stack=[]
 ;
 
 
@@ -61,7 +62,6 @@ moveRightToLeft={
     reset:function(){
         this.lastMove=0;
     },
-
     execute:function(sprite,context,time){
         //
         let elapsed=animationTimer.getElapsedTime(),
@@ -100,8 +100,12 @@ fallOnLedge={
                 nextSpriteBottomEstimate>ledge.top;
     },
     isOnLedge:function(sprite,ledge){
+        let spriteRight=sprite.left+sprite.width,
+            ledgeRight=ledge.left+ ledge.width;
+            //console.log(ledge.top,sprite.top,sprite.height);
         return sprite.left > ledge.left &&
-            (sprite.left+sprite.width) < ledge.left+ ledge.width;
+            spriteRight < ledgeRight&&(sprite.top+2*sprite.height===ledge.top)
+            ;
     },
     execute:function(sprite,context,time){
         if(isBallFalling()){
@@ -114,7 +118,7 @@ fallOnLedge={
                     //detectRange decides the true, real index of this hitLedge！
                     //决定了真正要比较的ledge的下标！
                     let index=detectRange(sprite,ledgeArr[i],ledgeArr);
-                    console.log(index);
+                    //console.log(index);
                     if(compareColor(sprite,ledgeArr[index])){
                         fallingAnimationTimer.stop();
                         sprite.top=ledgeArr[i].top-2*sprite.height;
@@ -122,19 +126,27 @@ fallOnLedge={
                         //console.log('hit and color equals');
                         sprite.velocityY=0;
                         sprite.tapTimes=0;
-                    } else {
-                        trapFalling(sprite);
+                    } else {                       
+                        if(!sprite.trap) {//默认是false
+                             limitAndFalling(sprite,ledgeArr[i]);
+                        //sprite.trap===true表示游戏结束了
+                            trapFalling(sprite);
+                        }
                     }
                 }
             }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
         }else {
             let ledgeArr=this.ledgeRect;
             for(let len=this.ledgeRect.length,i=0;i<len;i++){
+                //再次启动游戏，在更新了sprite的left和top之后，但是我startNewGame还没更新
+                //所有的数据。 
                 if(fallOnLedge.isOnLedge(sprite,ledgeArr[i])){
                     if(!compareColor(sprite,ledgeArr[i])&&ledgeArr[i].color!=undefined){
                         //sprite.velocityY=300;
-                        //console.log('trap');
-                        trapFalling(sprite);
+                        if(!sprite.trap){
+                            limitAndFalling(sprite,ledgeArr[i]);
+                            trapFalling(sprite);
+                        }
                     }
                 }
             }
@@ -152,6 +164,7 @@ moveGravity={
     //       return sprite.left + 2*BALL_RADIUS > LEDGE_LEFT &&
     //       sprite.left < LEDGE_LEFT + LEDGE_WIDTH;
     // },
+
     execute:function(sprite,context,time){
         let now=+new Date(),fps=sprite.fps;
         if(this.lastFrameTime==undefined){
@@ -159,21 +172,21 @@ moveGravity={
             return;
         }
 
-        Event.listen('OneTap',()=>{
-            startFalling(sprite);
-            this.lastFrameTime=now;
-
-        });
-
         if(isBallFalling()){
-            sprite.top+=sprite.velocityY/fps;///this.fps;
-            //falling equation
-            sprite.velocityY=(GRAVITY_FORCE)*
-                (fallingAnimationTimer.getElapsedTime()/1000) + TAP_VELOCITY;
-           // console.log(sprite.velocityY);
-            if(sprite.top>canvas.height){
-                stopFalling(sprite);
-            }  
+            if(Stack.length===0){
+                //判断小球速度是否为0
+                if(tap){
+                    tapSpeedingFalling(sprite,fps);
+                }
+                else{
+                    let fixedPosition=fallOnLedge.ledgeRect[0].top;
+                    if(sprite.velocityY>=0&&(sprite.top+2*sprite.height)<fixedPosition)
+                        normalFalling(sprite,fps);
+                }
+            }
+            else{
+                restoreSprite(sprite);
+            }
         }else{
             if(this.trap){
                 sprite.top+=sprite.velocityY/fps;
@@ -181,12 +194,54 @@ moveGravity={
                 if(sprite.top>canvas.height){
                     stopFalling(sprite);
                 }  
-            }
-        }
-    }
+            }//trap
+        }//else
+    }//execute
 };
 
 //All behavior helper function for  my game
+function restoreSprite(sprite){
+    let tmpSprite;//Pop最外层的
+    tmpSprite=Stack.pop();
+    sprite.top=tmpSprite.top;
+    sprite.velocityY=tmpSprite.velocityY;
+    fallingAnimationTimer.start();
+    tap=false;
+    while(tmpSprite.length>0){
+        Stack.pop();
+    }
+}
+
+
+function tapSpeedingFalling(sprite,fps){
+    sprite.top+=sprite.velocityY/fps;///this.fps;
+    //falling equation
+    //console.log(sprite.velocityY);
+    sprite.velocityY=(GRAVITY_FORCE)*
+        (fallingAnimationTimer.getElapsedTime()/1000) + TAP_VELOCITY;
+    // console.log(sprite.velocityY);
+    if(sprite.top>canvas.height){
+        stopFalling(sprite);
+    }      
+}
+//处理上升阶段的暂停
+function tapEaseFalling(sprite,fps){
+
+}
+
+function normalFalling(sprite,fps){
+    sprite.top+=sprite.velocityY/fps;
+    sprite.velocityY=(GRAVITY_FORCE)*
+                    (fallingAnimationTimer.getElapsedTime()/1000);
+    if(sprite.top>canvas.height){
+        stopFalling(sprite);
+    }
+}
+
+function storeSprite(sprite){
+    Stack.push(sprite);
+}
+
 function isBallFalling(){
     return fallingAnimationTimer.isRunning();
 }
@@ -195,27 +250,61 @@ function isBallFalling(){
 function startFalling(ballSprite){
     fallingAnimationTimer.start();
     //ballSprite.velocityX=0;
-    ballSprite.velocityY=0;
-
+    ballSprite.velocityY=0; //a specific value
+    tap=true;
 }
 
 function trapFalling(sprite){
-    //fallingAnimationTimer.start();
     sprite.velocityY=700;
+    sprite.top=1000;
+    sprite.left=1000;
     moveGravity.trap=true;
+    //结束游戏的事件
+    sprite.trap=true;
     Event.trigger('EndGame');//trigger event!
-    //console.log('endgame');
+    //stopFalling(sprite);
+    
+}
+
+function limitAndFalling(sprite,ledge){
+    let spriteRight=sprite.left+sprite.width,
+        ledgeRight=ledge.left+ledge.width;
+    if(sprite.left<=ledge.left){
+        sprite.left=ledge.left;
+    }
+    else if(spriteRight>=ledgeRight){
+        sprite.left=ledgeRight-sprite.width;
+    }
+
 }
 
 function stopFalling(sprite){
     reset(sprite);
 }
 
+function PauseHandler(sprite){
+    let fixedPosition=fallOnLedge.ledgeRect[0].top,
+        spritePosition=sprite.top+sprite.height*2;
+    if(spritePosition<fixedPosition){
+        fallingAnimationTimer.stop();
+        //pause=true;
+        storeSprite(sprite);
+    }
+}
+
+function RecoverHandler(){
+    fallingAnimationTimer.start();
+   // pause=false;
+}
+
+
 function reset(sprite){
     fallingAnimationTimer.stop();
     pushAnimationTimer.stop();
-    sprite.left=0; //0?
-    sprite.top=canvas.height;//
+    // if(sprite.top>canvas.height)
+    // canvas.height:900 
+    sprite.left=-1000; //0?
+    sprite.top=-1000;//
     sprite.velocityY=0;
 }
 
@@ -249,6 +338,7 @@ function detectRange(sprite,ledge,ledgeArr){
         leftWidth,
         rightWidth;
     let flag=identify(sprite,ledge);
+    index=1;
     //supposed index===1
     if(flag===0){
         return index;
@@ -282,4 +372,9 @@ function identify(sprite,ledge){
     }
 }
 
-export {runInPlace,moveRightToLeft,moveGravity,fallOnLedge};
+export {
+    runInPlace,moveRightToLeft,moveGravity,fallOnLedge,
+    RecoverHandler,
+    PauseHandler,
+    startFalling
+};

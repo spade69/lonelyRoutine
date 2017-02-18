@@ -17,16 +17,10 @@ import * as Animate from './common/animate';
 
 var game =new Game('miniGame','canvas'),
     loading=false, // loading flag
-
     //Score
     score=0,
     lastScore=0,
     lastScoreUpdate=undefined,
-
-    //High score
-    HIGH_SCORES_DISPLAYED=10,
-
-    //Paused
     
     //Over
     gameOver=false,
@@ -46,19 +40,28 @@ var game =new Game('miniGame','canvas'),
     // It needs to be an array, store the color of bottom rect
     // Length depends of the RECT_NUM
     // And contains every 
+    // draw前面的4个Rect
     ranColor=[],
+//draw后面4个Rect
     backColor=[],
+    //实际的用于检测对应的颜色数组
     currentLedgeColor=[],
     //store all colors
     stageColor=[],
     //color that you earn,also means the score!
+    //临时数组用于存储当前拥有的颜色，当创建好statge之后就存放了
+    //所有颜色
     myColor=[], //score?
+    //realMyObj存储了游戏中得到的气球，lineBall的 left距离和颜色！
+    //在下一局游戏时候要清除！
     realMyObj=[],//realMyColor=[],
     countRect=0,
 
+//临时数组，存放剩下的新颜色
     leftColor=[],
 
-
+    //High score
+    HIGH_SCORES_DISPLAYED=10,
     //Canvas
     CANVAS_WIDTH=game.context.canvas.width,
     CANVAS_HEIGHT=game.context.canvas.height,
@@ -95,7 +98,6 @@ let context=game.context;
 let scrollBackground=function(){
     //translate the canvas;
         //console.log('run background');
-        
         context.save();
         //%game.context.canvas.witdh;
         translateOffset=translateOffset<context.canvas.width?
@@ -121,7 +123,7 @@ let scrollBackground=function(){
             //console.log(countRect);
             updateMyRealColor();
             //every RECT_WIDTH we update the rect 's left
-            //resetLeft();
+            resetLeft();
         }
 
          //Paint Bottom 
@@ -130,9 +132,10 @@ let scrollBackground=function(){
         //It must be context.canvas.width ！if context.canvas.width-50
         //then it will be 50 gap! 
         paintBottomRectOff(context,context.canvas.width); //paintBottomRect
-
+        if(gameStart){
+            updateLedgeLeft(translateDelta);
+        }
         updateLedgeColor();
-        updateLedgeLeft();
         context.restore();
     },
 
@@ -248,11 +251,8 @@ let scrollBackground=function(){
         // }
         // else{
             //gameOverToast.style.display = 'inline';
-
             overDisplay='inline'; //change it to the top level
-
         // }
-
         gameOver=true;
         lastScore=score;
         score=0;
@@ -266,6 +266,12 @@ let scrollBackground=function(){
         game.togglePaused();
         //pausedToast.style.display = game.paused ? 'inline' : 'none';
         let displayx=game.paused?'inline':'none';
+    //Checking if game is paused and trigger paused
+        if(game.paused){
+            Event.trigger('GamePause');
+        }else{
+            Event.trigger('GameRecover');
+        }
         that.setState({
             display:displayx
         });
@@ -280,9 +286,10 @@ let scrollBackground=function(){
         togglePaused(this);
     };
 
+
 // 离开浏览器 失去焦点时触发
 function windowOnBlur(that){
-    console.log(loading,gameOver,game.paused);
+   // console.log(loading,gameOver,game.paused);
     if(!loading && !gameOver&& !game.paused){
         togglePaused(that);
         let displayx=game.paused?'inline':'none';
@@ -294,7 +301,7 @@ function windowOnBlur(that){
 }
 
 function windowOnFocus(that){
-    if(game.paused){
+    if(game.paused&&!gameOver){
         togglePaused(that);
         let displayx=game.paused?'inline':'none';
         that.setState({
@@ -306,23 +313,27 @@ function windowOnFocus(that){
 
 //New Game..................................
 //Actually this belongs to the over Compoent
-let newGameClickHandler=function(e){
-
+function newGameClick(){
+    let str='none';
+    setTimeout(()=>{
         startNewGame();
-        return 'none';
-    };
+        
+    },100);
+    return str;
+};
 
 function startNewGame(){
     //highScoreParagraph.style.display = 'none';
+    emptyArr();
     gameOver=false;
     livesLeft=1;
     score=0;
-    ballSprite.left=BALL_LAUNCH_LEFT;
-    ballSprite.top=BALL_LAUNCH_TOP;
-    ballSprite.velocityY=0;
-    // deepCopyColor();  //copy from FILL_STYLES to leftColor
-    // initalColor();//initialize color
-    // createStages(); //create totalColor
+    resetSprite();
+    deepCopyColor();  //copy from FILL_STYLES to leftColor
+    initalColor();//initialize color
+    createStages(); //create totalColor
+    //更新分数牌
+    Event.trigger('LoadScore');
 }
 
 //High Scores
@@ -420,7 +431,7 @@ let clearHighScoresCheckHandler=function(e){
     loadScoreDisplayHandler=function(){
         let newStateObj={
             scoreDisplay:'inline',
-            scoreText:'0'
+            scoreText:realMyObj.length
         };
         loading=false;
         score=10;
@@ -528,7 +539,7 @@ function createStages(){
 //handle Game event
 function handleGameClick(){
     //限制点击的次数，只能两次
-    if(ballSprite.tapTimes<2){
+    if(ballSprite.tapTimes<2&&!game.Paused){
         ballSprite.freeze=false;
         Event.trigger('OneTap');
         ballSprite.tapTimes++;
@@ -570,9 +581,12 @@ function updateLedgeColor(){
 
 function updateLedgeLeft(translateDelta){
     let tmpRect=Behavior.fallOnLedge.ledgeRect;
+   // resetLeft();
     for(let i=0;i<RECT_NUM;i++){
-        tmpRect[i].left-=translateDelta;
+        tmpRect[i].left=tmpRect[i].left-translateDelta;
+
     }
+    //console.log(tmpRect[1].left);
 }
 
 function resetLeft(){
@@ -583,11 +597,14 @@ function resetLeft(){
 }
 
 function endGame(){
+    //livesLeft为0 和 gameOver为true后面不触发over
+    //我们只有一条命
         livesLeft--;
         gameOver=true;
         score=0;
         countRect=0;
         Event.trigger('over');
+       
 }
 
 function emptyArr(){
@@ -595,6 +612,18 @@ function emptyArr(){
     stageColor=[];
     leftColor=[];
     myColor=[];
+    ranColor=[];backColor=[];
+    currentLedgeColor=[];
+}
+
+function resetSprite(){
+    ballSprite.color=[];
+    ballSprite.velocityX=0;
+    ballSprite.velocityY=0;
+    ballSprite.tapTimes=0;
+    ballSprite.left=BALL_LAUNCH_LEFT;
+    ballSprite.top=BALL_LAUNCH_TOP;
+    ballSprite.trap=false;
 }
 
 function updateMyRealColor(){ //countRect realMyColor myColor
@@ -604,10 +633,14 @@ function updateMyRealColor(){ //countRect realMyColor myColor
         if(color){ //if color==undefined, then escape it 
             let tmpObj={color:color,left:leftOffset};
             realMyObj.push(tmpObj);
+            //console.log(ballSprite.color);
+            ballSprite.color.push(color);
+            //触发更新分数,事件在ScoreToast中监听
+            Event.trigger('LoadScore');
         }
         //realMyColor.push(color);//adding new color 
     }
-    if(realMyObj.length<12){//if length >11
+    if(realMyObj.length<11){//if length >11
         Event.trigger('updateLineBallObj',realMyObj);
     }
 }
@@ -656,7 +689,7 @@ ballSprite.width=BALL_WIDTH;
 ballSprite.height=BALL_HEIGHT;
 ballSprite.velocityX=10;
 ballSprite.velocityY=0;
-console.log(Behavior.fallOnLedge);
+//console.log(Behavior.fallOnLedge);
 game.addSprite(ballSprite);
 
 deepCopyColor();  //copy from FILL_STYLES to leftColor
@@ -664,8 +697,17 @@ initalColor();//initialize color
 createStages(); //create totalColor stageColor
 //console.log(stageColor);
 
-//hadnler of Endgame
+//hadnler of Game Event 
 Event.listen('EndGame',endGame);
+Event.listen('GamePause',()=>{Behavior.PauseHandler(ballSprite)});
+Event.listen('GameRecover',Behavior.RecoverHandler);
+Event.listen('OneTap',TapHandler);
+
+function TapHandler(){
+    let now=+new Date();
+    Behavior.startFalling(ballSprite);
+    Behavior.moveGravity.lastFrameTime=now;
+}
 
 let loadButtonHandler=function(e){
     let interval,loadingPercentComplete=0;
@@ -722,7 +764,7 @@ game.startAnimate=function(){
 //called after thr sprites are painted
 game.paintOverSprites=function(translateOffset){
     scrollBackground();
-   // updateMyRealColor();
+   // checkPausedAndTrigger();
 };
 
 //Called before the sprite is painted 
@@ -737,7 +779,8 @@ game.paintUnderSprites=function(){//Draw things other than sprites
         ///来获取这个改变后的state值，然后更新state。 其实也就是说
         ///我的React里面的某个事件会触发这个state改变，但是改变是在
         ///我业务逻辑中实现的 
-        Event.trigger('over');
+        console.log('life ===0 but game not over');
+        //Event.trigger('over');
     }else{
         paintSun(game.context);
 
@@ -757,7 +800,7 @@ export {
     over,updateScore,
     togglePaused,pauseToastClickHandler,
     windowOnBlur,windowOnFocus,
-    newGameClickHandler,
+    newGameClick,
     addScoreClickHandler,
     newGameFromScoreClickHandler,
     nameInputKeyUpHandler,
@@ -765,5 +808,6 @@ export {
     loadButtonHandler,
     loadScoreDisplayHandler,
     startNewGame,
+    gameOver,
     game
 };

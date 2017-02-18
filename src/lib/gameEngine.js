@@ -143,6 +143,7 @@ Game.prototype={
         if(this.paused){
             //check if the game is still paused , in PAUSE_TIMEOUT. no need to check
             //more frequently
+            
             setTimeout(()=>{
                 window.requestNextAnimationFrame((time)=>{
                     //this.animate.call(this,time);
@@ -195,7 +196,7 @@ Game.prototype={
     },
 
     //Update all sprites . The sprite update() method invokes all of a
-    //sprite 's behaviors
+    //sprite 's behaviors  ，命令模式: update && paint
     updateSprites:function(time){
         for(let i=0;i<this.sprites.length;++i){
             let sprite=this.sprites[i];

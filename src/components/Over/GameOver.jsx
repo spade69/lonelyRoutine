@@ -14,10 +14,7 @@ const s={Overtoast:'gameOverToast',title:'title',toast:'toast'};
 class GameOver extends React.Component{
     constructor(props){
         super(props);
-        // this.state={
-        //     value:'',
-        //     display:'none' //block
-        // };
+
         //this.handleOver=this.handleOver.bind(this);
         this.handleClick=this.handleClick.bind(this);
     }
@@ -32,7 +29,6 @@ class GameOver extends React.Component{
     }
 
     render(){
-        //const this.state.
         const display=this.props.overDisplay;
         return(
             <div className={s.Overtoast+' '+s.toast} style={{display:display}} >
