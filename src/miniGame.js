@@ -135,6 +135,7 @@ let scrollBackground=function(){
         if(gameStart){
             updateLedgeLeft(translateDelta);
         }
+        //此处更新ledgeColor
         updateLedgeColor();
         context.restore();
     },
@@ -278,14 +279,14 @@ let scrollBackground=function(){
         
     },
 
-    pauseToastClickHandler=function(e){
+    pauseToastClickHandler=function(that){
         //this --> the object in JSX
-        this.setState({
-            display:'none'
-        });
-        togglePaused(this);
-    };
-
+        // that.setState({
+        //     display:'none'
+        // });
+        togglePaused(that);
+    }
+;
 
 // 离开浏览器 失去焦点时触发
 function windowOnBlur(that){
@@ -315,25 +316,32 @@ function windowOnFocus(that){
 //Actually this belongs to the over Compoent
 function newGameClick(){
     let str='none';
+    //因为setState是异步的，所以其实这里应该promise，等到
+    //状态resolved才执行startNewGame()
     setTimeout(()=>{
         startNewGame();
-        
+         setTimeout(()=>{
+            //这里异步执行
+            resetSprite();      
+          },500);
     },100);
     return str;
 };
 
 function startNewGame(){
     //highScoreParagraph.style.display = 'none';
+    ////让sprite.color最快重置为[] ? 在endGame那里重置才对
     emptyArr();
     gameOver=false;
     livesLeft=1;
     score=0;
-    resetSprite();
     deepCopyColor();  //copy from FILL_STYLES to leftColor
     initalColor();//initialize color
     createStages(); //create totalColor
     //更新分数牌
     Event.trigger('LoadScore');
+    //重置sprite应该在ledgeColor更新之后！
+    
 }
 
 //High Scores
@@ -458,12 +466,14 @@ function randomColorMerge(Arr1,Arr2){
 function initalColor(){
     let initial=generateRandom(leftColor);
     //spriteColor.push(initial);
-    if(ballSprite){
+    //if(ballSprite){
+    console.log('inial');
         ballSprite.color.push(initial);
-    }
+    //}
     for(var i=0;i<RECT_NUM;i++){//RECT_NUM*2
         ranColor.push(initial);
         backColor.push(initial);
+        //更新ledgeColor
         currentLedgeColor.push(initial);
         stageColor.push(initial);
     }
@@ -547,7 +557,6 @@ function handleGameClick(){
 }
 //lookup table 
 function updateCurrentColor(translateOffset){
-    let a=100;
     switch(translateOffset){
         case 0: 
             for(let i=0;i<RECT_NUM;i++){
@@ -582,6 +591,8 @@ function updateLedgeColor(){
 function updateLedgeLeft(translateDelta){
     let tmpRect=Behavior.fallOnLedge.ledgeRect;
    // resetLeft();
+   // 有一定规律遇到颜色相同但是还是会falling，这是游戏故意
+   // 设置的难度
     for(let i=0;i<RECT_NUM;i++){
         tmpRect[i].left=tmpRect[i].left-translateDelta;
 
@@ -603,6 +614,7 @@ function endGame(){
         gameOver=true;
         score=0;
         countRect=0;
+        ballSprite.color=[];
         Event.trigger('over');
        
 }
@@ -617,7 +629,7 @@ function emptyArr(){
 }
 
 function resetSprite(){
-    ballSprite.color=[];
+    //ballSprite.color=[];
     ballSprite.velocityX=0;
     ballSprite.velocityY=0;
     ballSprite.tapTimes=0;
@@ -660,7 +672,8 @@ function calculLeftOffset(){
     return leftOffset;
 }
 
-context.canvas.onclick=handleGameClick;
+//context.canvas.onclick=handleGameClick;
+context.canvas.addEventListener('click',handleGameClick);
 
 // setInterval(()=>{    
 //      //});
@@ -691,7 +704,7 @@ ballSprite.velocityX=10;
 ballSprite.velocityY=0;
 //console.log(Behavior.fallOnLedge);
 game.addSprite(ballSprite);
-
+ballSprite.color=[];
 deepCopyColor();  //copy from FILL_STYLES to leftColor
 initalColor();//initialize color
 createStages(); //create totalColor stageColor

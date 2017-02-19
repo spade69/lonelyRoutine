@@ -141,7 +141,8 @@ fallOnLedge={
                 //再次启动游戏，在更新了sprite的left和top之后，但是我startNewGame还没更新
                 //所有的数据。 
                 if(fallOnLedge.isOnLedge(sprite,ledgeArr[i])){
-                    if(!compareColor(sprite,ledgeArr[i])&&ledgeArr[i].color!=undefined){
+                    if(!compareColor(sprite,ledgeArr[i])&&ledgeArr[i].color!=undefined
+                        &&sprite.color.length!==0){
                         //sprite.velocityY=300;
                         if(!sprite.trap){
                             limitAndFalling(sprite,ledgeArr[i]);
@@ -256,6 +257,7 @@ function startFalling(ballSprite){
 
 function trapFalling(sprite){
     sprite.velocityY=700;
+    sprite.color=[];
     sprite.top=1000;
     sprite.left=1000;
     moveGravity.trap=true;

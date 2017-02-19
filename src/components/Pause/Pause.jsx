@@ -12,7 +12,21 @@ import * as MiniGame from '../../miniGame';
 const s={
     toast:'pauseToast',
     toastOrigin:'toast',
-    pause:'pause'
+    pause:'pause',
+    pauseButton:'pauseButton'
+}
+let stylePause={
+    borderLeft:'10px solid white',
+    borderRight:'10px solid white',
+    display:'inline',
+    position:'absolute',
+    left:'6%',
+    top:'12%',
+    width:'auto',
+    height:'auto',
+    color:'transparent',
+    cursor:'pointer',
+    zIndex:'1000'
 }
 
 class Pause extends React.Component{
@@ -23,6 +37,7 @@ class Pause extends React.Component{
             display:'none'
         };
         this.handleClick=this.handleClick.bind(this);
+       
     }
 
     componentWillMount(){
@@ -48,15 +63,20 @@ class Pause extends React.Component{
         MiniGame.pauseToastClickHandler(this);
     }
 
+
+
     render(){
         const display=this.state.display;
         return(
-            <div className={s.toast+' '+s.toastOrigin} 
-                    onClick={this.handleClick}
-                    style={{display:display}}>
-                <p className={s.pause}>{this.props.pause.info}</p>
-                <p>{this.props.pause.start}</p>
-                <span></span>
+            <div>
+                <div className={s.toast+' '+s.toastOrigin} 
+                        onClick={this.handleClick}
+                        style={{display:display}}>
+                    <p className={s.pause}>{this.props.pause.info}</p>
+                    <p>{this.props.pause.start}</p>
+                </div>
+                <span style={stylePause} 
+                            onClick={this.handleClick}>|</span>
             </div>
         );
     }

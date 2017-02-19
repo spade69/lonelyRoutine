@@ -56,7 +56,7 @@ class App extends React.Component{
     componentDidMount(){
         // 启动游戏
         MiniGame.game.start(this);
-        MiniGame.startNewGame(); 
+        //MiniGame.startNewGame(); 
         //Event.listen('LoadScore',MiniGame.loadScoreDisplayHandler)
         Event.listen('over',()=>{
             let overDisplay=MiniGame.over(this);
