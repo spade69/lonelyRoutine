@@ -536,7 +536,7 @@ function createStages(){
         }
         //let newArr=randomColorMerge(myColor,leftColor);
         let color;
-        if(i%3==0&&len>0)
+        if(i%3==0&&len>0) //每隔2个就添加一个新颜色中的一个
              color=generateRandom(leftColor) ;
         else {
              color=generateRandom(myColor)
