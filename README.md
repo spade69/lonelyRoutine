@@ -1,7 +1,8 @@
 # lonelyRoutine
 A game framework with a minimalism game
 
-Game Engine --> gameEngina.js
+###Game Engine --> gameEngina.js
+
 Consists of:
 - Game Loop
 - Update frame rate
