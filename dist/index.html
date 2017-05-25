@@ -1,16 +1,18 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="HandheldFriendly" content="true">
     <title>React game</title>
 </head>
 <body>
     <div id="container">
         <div id="root"></div>
-        <canvas id="canvas" width=600 height=900>Canvas not supported</canvas>
+        <canvas id="canvas">Canvas not supported</canvas>
     </div>
-
-    <script src="common.js"></script>
-    <script src="index.bundle.js"></script> 
+    <script type="text/javascript" src="responsive.js"></script>
+    <script src="common.js" defer async></script>
+    <script src="index.bundle.js" defer async></script> 
 </body>
 </html>

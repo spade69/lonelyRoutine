@@ -10,8 +10,10 @@
 import React from 'react';
 import './Score.scss';
 import Event from '../../lib/observer.js';
-
+import * as gv from '../../common/global.js';
 //only div
+const CANVAS_WIDTH=gv.canvas.width;
+const CANVAS_HEIGHT=gv.canvas.height;
 const s={toast:'toast',scoreToast:'scoreToast'};
 let styleObj={
     width:'30px',

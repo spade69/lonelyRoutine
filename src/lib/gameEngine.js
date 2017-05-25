@@ -33,12 +33,12 @@ function Game(gameName,canvasId){
     this.HIGH_SCORES_SUFFIX='Scores';
     //Image loading
     //
-    this.imgaeLoadingProgressCallback;
-    this.images={};
-    this.imageUrls=[];
-    this.imagesLoaded=0;
-    this.imagesFailedToLoad=0;
-    this.imagesIndex=0;
+    this.imgaeLoadingProgressCallback; //图片加载进度回调
+    this.images={}; 
+    this.imageUrls=[]; //图片url集合
+    this.imagesLoaded=0; //加载完的图片个数
+    this.imagesFailedToLoad=0; //加载失败的图片个数
+    this.imagesIndex=0; //
 
     //Time
     this.startTime=0;
@@ -143,7 +143,6 @@ Game.prototype={
         if(this.paused){
             //check if the game is still paused , in PAUSE_TIMEOUT. no need to check
             //more frequently
-            
             setTimeout(()=>{
                 window.requestNextAnimationFrame((time)=>{
                     //this.animate.call(this,time);
@@ -152,7 +151,7 @@ Game.prototype={
             },this.PAUSE_TIMEOUT);
         }else{  //game is not paused
             this.tick(time);  //Update fps game time
-            this.clearScreen(); //clear the screen
+            this.clearScreen(); //clear the screen, affect performance? 
 
             this.startAnimate(time); //Override it
             this.paintUnderSprites(that); //Override 
@@ -162,9 +161,7 @@ Game.prototype={
 
             this.paintOverSprites(); //Override
             this.endAnimate(); //Override yourself
-
-            this.lastTime=time;
-
+            this.lastTime=time;//update lastTime to calculate fps
             //call this method again when it's time for  the next animation frame
             window.requestNextAnimationFrame((time)=>{
                 this.animate.call(this,time); 
@@ -185,8 +182,12 @@ Game.prototype={
         //Here calculate the fps!
         if (this.lastTime===0)
             this.fps=this.STARTING_FPS;
-        else
+        else{
+            //利用这个帧速率对我们的游戏做一些调整，因为浏览器在不同的硬件平台或者
+            //当前开启了很多进程。卡顿，那么帧速率肯定是会掉下来的，我们可以根据这个
+            //帧速率来调整我们动画中，精灵或者对象的运动速度。
             this.fps=1000/(time-this.lastTime);
+        }
     },
     //Clear the entire canvas
     clearScreen:function(){

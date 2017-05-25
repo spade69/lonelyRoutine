@@ -108,8 +108,8 @@ let scrollBackground=function(){
         
 // Two image actually ! Use one to cover the gap of another 
 // 两张图片(两个图形)，一个去弥补另一个
-        paintNearCloud(context,120,20);
-        paintNearCloud(context,context.canvas.width+120,20);
+        // paintNearCloud(context,120,20);
+        // paintNearCloud(context,context.canvas.width+120,20);
         //console.log(currentLedgeColor);
         //这两个判断需要gameStart为true的时候才对！
         if(translateOffset===CANVAS_WIDTH&&gameStart){
@@ -141,7 +141,21 @@ let scrollBackground=function(){
     },
 
     //Paint methods
-    //
+    //每一个离屏canvas的更新其实不会在浏览器上
+    drawOnOffScreen=function(offcanvas){
+        offcanvas.width=CANVAS_WIDTH;
+        offcanvas.height=CANVAS_HEIGHT;
+        var offContext=offcanvas.getContext('2d');
+        paintNearCloud(offContext,120,20);
+        paintNearCloud(offContext,offContext.canvas.width+120,20);
+                 //Paint Bottom 
+        paintBottomRect(offContext,0);
+
+        //It must be context.canvas.width ！if context.canvas.width-50
+        //then it will be 50 gap! 
+        paintBottomRectOff(offContext,offContext.canvas.width); //paintBottomRect
+    },
+    
     paintBottomRect=function(context,offset){
         let y=context.canvas.height-RECT_HEIGHT;//x
         //change too fast , 
@@ -183,7 +197,7 @@ let scrollBackground=function(){
 
        context.restore();
     },
-    paintFarCloud=function(context,x,y){
+/*    paintFarCloud=function(context,x,y){
         context.save();
         context.lineWidth=0.5; 
         context.strokeStyle='rgba(100,140,230,0,0.8)';
@@ -203,7 +217,7 @@ let scrollBackground=function(){
         context.stroke();
         context.fill();
         context.restore();
-    },
+    },*/
 
     paintNearCloud=function(context,x,y){
        context.save();
@@ -673,11 +687,8 @@ function calculLeftOffset(){
 }
 
 //context.canvas.onclick=handleGameClick;
-context.canvas.addEventListener('click',handleGameClick);
 
-// setInterval(()=>{    
-//      //});
-// },5000);
+
 
 
 //Load game ....................................................
@@ -711,6 +722,7 @@ createStages(); //create totalColor stageColor
 //console.log(stageColor);
 
 //hadnler of Game Event 
+context.canvas.addEventListener('click',handleGameClick);
 Event.listen('EndGame',endGame);
 Event.listen('GamePause',()=>{Behavior.PauseHandler(ballSprite)});
 Event.listen('GameRecover',Behavior.RecoverHandler);
@@ -760,10 +772,10 @@ let loadButtonHandler=function(e){
                             Event.trigger('LoadScore');
                             gameStart=true;
                             //console.log('here');
-                        },500);
-                    },100);
-                },100);
-            },100);
+                        },50);
+                    },10);
+                },10);
+            },10);
         }
          //progressbar.draw(loadingPercentComplete);
     },16)

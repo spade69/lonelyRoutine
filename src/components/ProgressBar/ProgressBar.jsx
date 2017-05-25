@@ -9,6 +9,53 @@ import React from 'react';
 import './Progress.scss';
 import * as MiniGame from '../../miniGame';
 import Event from '../../lib/observer.js';
+import * as gv from '../../common/global.js';
+const CANVAS_WIDTH=gv.canvas.width;
+const CANVAS_HEIGHT=gv.canvas.height;
+let progressRoot={
+    position:'relative',
+    width:CANVAS_WIDTH
+    },
+    progressTitle={
+        font:'16px Arial'
+    },
+
+    progressButton={
+        paddingTop:'50%',
+        marginTop:'50%',
+        padding:'20px',
+        position:'absolute',
+        left:'40%',
+        top:CANVAS_WIDTH/2,
+        width:'16%',
+        height:CANVAS_HEIGHT/12,
+        display:'block',
+        backgroundColor:'white',
+        margin:'0 auto',
+        borderRadius:'20px',
+        boxShadow :'1px 1px 5px #999'
+    },
+    progressInput={
+        position:'absolute',
+        width:'0',
+        height:'0',
+        marginLeft:'20%',
+        marginTop:'20%',
+        border:CANVAS_WIDTH/24+'px solid transparent',
+        borderLeft: CANVAS_WIDTH/12+'px solid #00CC00',
+        backgroundColor:'transparent',
+        content:' '
+    },
+    progressDiv={
+        paddingLeft:'60px',
+        paddingTop:'45px'
+    },
+    progressMsg={
+        display:'none',
+        font:'15px Helvetica',
+        paddingLeft:'20px',
+        color:'blue'
+    }
 
 const s={
     root:'Progress-root',
@@ -32,15 +79,15 @@ class LoadButton extends React.Component{
     }
 
     render(){
-        const MsgDisplay=this.props.loadMsgDisplay; //don't use this.props
-        const display=this.props.display;
+        progressMsg.display=this.props.loadMsgDisplay; //don't use this.props
+        progressInput.display=this.props.display;
         return(
-            <span className={s.button+' '+s.arrow}>
+            <span style={progressButton}>
                 <input type='button' value={this.props.progress.value} 
-                                            style={{display:display}}
+                                            style={progressInput}
                                             onClick={this.props.onClick}
-                                            className={s.input} />
-                <span className={s.msg} style={{display:MsgDisplay}}>{this.props.progress.msg}</span>
+                                             />
+                <span style={progressMsg}>{this.props.progress.msg}</span>
             </span>
         );
     }
@@ -84,18 +131,17 @@ class progressBar extends React.Component{
     render(){
         const loadButtonDisplay=this.state.loadButtonDisplay;
         const loadMsgDisplay=this.state.loadMsgDisplay;
-        const progressDivDisplay=this.state.progressDivDisplay;
-        const loadingToastDisplay=this.state.loadingToastDisplay;
-        const loadingTitle=this.state.loadingTitle;
+        progressDiv.display=this.state.progressDivDisplay;
+        progressRoot.display=this.state.loadingToastDisplay;
+        progressTitle.display=this.state.loadingTitle;
         return(
-            <div className={s.root} style={{display:loadingToastDisplay}}>
-                <span className={s.title} style={{display:loadingTitle}}>{this.props.progress.title}</span>
+            <div style={progressRoot}>
+                <span style={progressTitle}>{this.props.progress.title}</span>
                 <LoadButton progress={this.props.progress} 
                                     display={loadButtonDisplay}
                                     loadMsgDisplay={loadMsgDisplay}
                                     onClick={this.handlerClick}/>
-                <div className={s.progress} 
-                        style={{display:progressDivDisplay}}></div>
+                <div style={progressDiv}></div>
             </div>
         );
     }

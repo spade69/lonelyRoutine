@@ -21,7 +21,14 @@
     --screen-md-min: 992px;  /* Medium screen / desktop */
     --screen-lg-min: 1200px; /* Large screen / wide desktop */
 }
-body{background:#dddddd;}
+body{
+  background:#dddddd;
+  height:100%;
+  width:100%;
+  padding:0;
+  display:block;
+  overflow:hidden;
+}
 
 
 div .title { 
@@ -49,8 +56,6 @@ p.title {
 
 #canvas{
     cursor:pointer;
-    margin-left:10px;
-    margin-top:10px;
     //background:url('/public/sky.png');
     background:{
       color:#87CEFA;

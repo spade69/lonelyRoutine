@@ -8,8 +8,17 @@
 import React from 'react';
 import * as MiniGame from '../../miniGame';
 import './Over.scss';
-//
+import * as gv from '../../common/global.js';
+const CANVAS_WIDTH=gv.canvas.width;
+const CANVAS_HEIGHT=gv.canvas.height;
 const s={Overtoast:'gameOverToast',title:'title',toast:'toast'};
+
+let gameOverToast={
+    padding:CANVAS_WIDTH/20+'px',
+    marginLeft:'25%',
+    marginTop:'20%',
+    textAlign:'center'
+}
 
 class GameOver extends React.Component{
     constructor(props){
@@ -29,9 +38,9 @@ class GameOver extends React.Component{
     }
 
     render(){
-        const display=this.props.overDisplay;
+        gameOverToast.display=this.props.overDisplay;
         return(
-            <div className={s.Overtoast+' '+s.toast} style={{display:display}} >
+            <div className={s.toast} style={gameOverToast} >
                 <p className={s.title}>{this.props.over.title}</p>
                 <p>
                     <input type='checkbox' />

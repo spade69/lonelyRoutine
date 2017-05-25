@@ -18,11 +18,11 @@ const ANIMATION_DURATION=GB.ANIMATION_DURATION,
     BALL_RADIUS=GB.BALL_RADIUS;
 
 let canvas=GB.canvas,
-    arrow=LEFT,
-    LEDGE_LEFT   = 280,
-    LEDGE_TOP    = 55,
-    LEDGE_WIDTH  = 50,
-    LEDGE_HEIGHT = 12,
+    //arrow=LEFT,
+    //LEDGE_LEFT   = 280,
+    //LEDGE_TOP    = 55,
+    //LEDGE_WIDTH  = 50,
+    //LEDGE_HEIGHT = 12,
     linear=AnimationTimer.makeLinear(1),
     easeIn=AnimationTimer.makeEaseIn(1),
     easeOut=AnimationTimer.makeEaseOut(1),
@@ -108,7 +108,7 @@ fallOnLedge={
             ;
     },
     execute:function(sprite,context,time){
-        if(isBallFalling()){
+        if(isBallFalling()){ //判断是否下降
             let ledgeArr=this.ledgeRect;
             for(let len=this.ledgeRect.length,i=0;i<len;i++){
                 //Use this object directly~
@@ -128,7 +128,7 @@ fallOnLedge={
                         sprite.tapTimes=0;
                     } else {                       
                         if(!sprite.trap) {//默认是false
-                             limitAndFalling(sprite,ledgeArr[i]);
+                            limitAndFalling(sprite,ledgeArr[i]);
                         //sprite.trap===true表示游戏结束了
                             trapFalling(sprite);
                         }
@@ -167,6 +167,7 @@ moveGravity={
     // },
 
     execute:function(sprite,context,time){
+        //update game time 
         let now=+new Date(),fps=sprite.fps;
         if(this.lastFrameTime==undefined){
             this.lastFrameTime=now;
@@ -176,16 +177,18 @@ moveGravity={
         if(isBallFalling()){
             if(Stack.length===0){
                 //判断小球速度是否为0
-                if(tap){
+                if(tap){// 判断是否
                     tapSpeedingFalling(sprite,fps);
                 }
                 else{
+                    //fixedPosition是底部矩形的top位置
                     let fixedPosition=fallOnLedge.ledgeRect[0].top;
                     if(sprite.velocityY>=0&&(sprite.top+2*sprite.height)<fixedPosition)
                         normalFalling(sprite,fps);
                 }
             }
             else{
+                //恢复精灵
                 restoreSprite(sprite);
             }
         }else{
@@ -213,7 +216,7 @@ function restoreSprite(sprite){
     }
 }
 
-
+//上抛运动
 function tapSpeedingFalling(sprite,fps){
     sprite.top+=sprite.velocityY/fps;///this.fps;
     //falling equation
@@ -230,11 +233,12 @@ function tapEaseFalling(sprite,fps){
 
 }
 
+// 普通下落
 function normalFalling(sprite,fps){
     sprite.top+=sprite.velocityY/fps;
     sprite.velocityY=(GRAVITY_FORCE)*
                     (fallingAnimationTimer.getElapsedTime()/1000);
-    if(sprite.top>canvas.height){
+    if(sprite.top>canvas.height){//直到大于canvas.height
         stopFalling(sprite);
     }
 }
@@ -244,6 +248,7 @@ function storeSprite(sprite){
 }
 
 function isBallFalling(){
+    //判断fallingTimer是否在计时 
     return fallingAnimationTimer.isRunning();
 }
 
@@ -287,10 +292,10 @@ function stopFalling(sprite){
 function PauseHandler(sprite){
     let fixedPosition=fallOnLedge.ledgeRect[0].top,
         spritePosition=sprite.top+sprite.height*2;
-    if(spritePosition<fixedPosition){
+    if(spritePosition<fixedPosition){//如果精灵的top小于矩形top即精灵还在矩形上方
         fallingAnimationTimer.stop();
         //pause=true;
-        storeSprite(sprite);
+        storeSprite(sprite); //此处存放精灵的状态 
     }
 }
 

@@ -47,7 +47,7 @@ window.requestNextAnimationFrame=
           window.mozRequestAnimationFrame||
           window.oRequestAnimationFrame||
           window.msRequestAnimationFrame||
-
+    //compatiable 
     function (callback,element){
       var start,finish;
       window.setTimeout(function(){
